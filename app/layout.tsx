@@ -26,7 +26,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 const siteUrl = (
   process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://faradhita.vercel.app'
 ).replace(/\/+$/, '');
-const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+const googleVerification =
+  process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim() ||
+  'xldoMSdwb1lUUzyqGUUnoJ1GeaNZkuhFRvzv9ikFwdA';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
