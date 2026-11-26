@@ -1,0 +1,337 @@
+{
+  "profile": {
+    "full_name_1": "Faradhita",
+    "full_name_2": "Eka Septiana",
+    "logo_text": "FES",
+    "role": "Data Analyst & Data Science · Lulusan Teknik Informatika",
+    "hero_cta_primary": "Lihat project",
+    "hero_cta_secondary": "Hubungi saya",
+    "hero_photo_url": "drive/foto-fara/01-foto-faradhita-eka-septiana.webp",
+    "about_photo_url": "drive/foto-fara/02-faradhita-eka-septiana.webp",
+    "about_text": "Lulusan S1 Teknik Informatika dengan penjurusan Data Science dengan minat yang kuat pada bidang analisis dan visualisasi data. Memiliki pengalaman dalam mengolah data dan membuat grafik untuk portal Satu Data Jombang di Diskominfo, serta menyusun laporan berbasis data stok sebagai admin di SPPG Mangunan. Terbiasa menggunakan Python dan Microsoft Excel, serta berpengalaman dalam analisis teks (NLP) melalui penelitian yang dipublikasikan di jurnal ilmiah.",
+    "contact_intro": "Terbuka untuk peran Data Analyst atau Data Science, termasuk magang atau posisi pemula.",
+    "whatsapp_url": "https://wa.me/6281335438577",
+    "linkedin_url": "https://linkedin.com/in/faradhita-eka-septiana",
+    "email": "fradhita27@gmail.com",
+    "location": "Jombang, Jawa Timur",
+    "meta_title": "Faradhita Eka Septiana – Portofolio Data",
+    "meta_description": "Portofolio Data Analyst & Data Science Faradhita Eka Septiana: project visualisasi data, analisis sentimen NLP, segmentasi RFM, publikasi jurnal, dan sertifikat.",
+    "og_image_url": "drive/foto-fara/01-foto-faradhita-eka-septiana.webp"
+  },
+  "facts": [
+    {
+      "order": 1,
+      "visible": true,
+      "value": "3,88",
+      "label": "IPK dari 4,00"
+    },
+    {
+      "order": 2,
+      "visible": true,
+      "value": "3",
+      "label": "project data bersertifikat"
+    },
+    {
+      "order": 3,
+      "visible": true,
+      "value": "1",
+      "label": "publikasi jurnal ilmiah"
+    }
+  ],
+  "projects": [
+    {
+      "order": 1,
+      "visible": true,
+      "title": "Retail Transaction Dashboard",
+      "slug": "retail-transaction-dashboard",
+      "tags": "Google Looker Studio, Figma, Dashboard",
+      "description": "Studi kasus sebuah perusahaan ritel yang baru punya aplikasi pencatatan transaksi. Product manager meminta dashboard untuk menganalisis performa penjualan.",
+      "points": [
+        {
+          "label": "Kebutuhan dashboard",
+          "text": "Performa transaksi secara keseluruhan dan tren penjualan."
+        },
+        {
+          "label": "",
+          "text": "Performa tiap metode pembayaran dan produk yang paling laku."
+        },
+        {
+          "label": "",
+          "text": "Besar pengeluaran untuk diskon."
+        },
+        {
+          "label": "",
+          "text": "Ringkasan transaksi untuk setiap produk dan pelanggan."
+        }
+      ],
+      "images": [
+        {
+          "url": "drive/looker-studio/Mockup.png",
+          "caption": "Mockup di Figma, dibuat sebelum dashboard direalisasikan.",
+          "wide": false
+        },
+        {
+          "url": "drive/looker-studio/Transaction_Report_page.jpg",
+          "caption": "Hasil akhir dashboard.",
+          "wide": true
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "visible": true,
+      "title": "Analisis Sentimen Tweet (NLP)",
+      "slug": "analisis-sentimen-tweet-nlp",
+      "tags": "Python, NLTK, scikit-learn, Seaborn",
+      "description": "Klasifikasi sentimen tweet ke empat kelas: positif, netral, negatif, dan tidak relevan.",
+      "points": [
+        {
+          "label": "Pembersihan data",
+          "text": "334 nilai kosong dan 1.266 duplikat dihapus. Outlier panjang tweet dibuang dengan metode IQR (batas atas 55,5 kata)."
+        },
+        {
+          "label": "EDA",
+          "text": "Distribusi label, wordcloud per sentimen, dan frekuensi sentimen per entitas."
+        },
+        {
+          "label": "Model",
+          "text": "Logistic Regression, KNN, Decision Tree, dan Random Forest."
+        },
+        {
+          "label": "Hasil",
+          "text": "Random Forest terbaik dengan akurasi uji 66,2%. KNN dan Decision Tree overfitting (akurasi latih di atas 93%)."
+        }
+      ],
+      "images": [
+        {
+          "url": "drive/python-ds/EDA.png",
+          "caption": "Wordcloud per kategori sentimen.",
+          "wide": true
+        },
+        {
+          "url": "drive/python-ds/download-1.png",
+          "caption": "Distribusi label setelah dibersihkan.",
+          "wide": false
+        },
+        {
+          "url": "drive/python-ds/download.png",
+          "caption": "Panjang tweet sebelum dan sesudah menghapus outlier.",
+          "wide": false
+        },
+        {
+          "url": "drive/python-ds/EDA-2.png",
+          "caption": "Frekuensi sentimen per entitas: NBA2K dominan negatif, Assassin's Creed dominan positif.",
+          "wide": true
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "visible": true,
+      "title": "Segmentasi Pelanggan dengan RFM",
+      "slug": "segmentasi-pelanggan-dengan-rfm",
+      "tags": "Python, Pandas, RFM Analysis",
+      "description": "Mengelompokkan 3.889 pelanggan toko online ke 10 segmen berdasarkan Recency, Frequency, dan Monetary.",
+      "points": [
+        {
+          "label": "Alur",
+          "text": "Impor data, pembersihan, agregasi per pelanggan, hitung hari sejak order terakhir, lalu beri skor 1 sampai 5 dengan persentil."
+        },
+        {
+          "label": "Segmen terbesar",
+          "text": "Hibernating 27,3%, Champion 14,1%, Loyal Customers 14,0%."
+        },
+        {
+          "label": "Rekomendasi",
+          "text": "Dorong urgensi transaksi untuk Loyal Customers, tambah jumlah transaksi untuk Potential Loyalists, dan ajak Hibernating kembali bertransaksi."
+        }
+      ],
+      "images": [
+        {
+          "url": "drive/python-da/rfm-summary.jpg",
+          "caption": "Ringkasan tiap segmen: jumlah pelanggan, rata-rata recency, frekuensi, dan nilai belanja.",
+          "wide": true
+        }
+      ]
+    }
+  ],
+  "certificates": [
+    {
+      "order": 1,
+      "visible": true,
+      "title": "Python for Data Science",
+      "image_url": "drive/sertifikat/cert-python-ds.jpg",
+      "issuer": "MySkill",
+      "issued_at": "April 2025",
+      "credential_url": ""
+    },
+    {
+      "order": 2,
+      "visible": true,
+      "title": "Python for Data Analysis",
+      "image_url": "drive/sertifikat/cert-python-da.jpg",
+      "issuer": "MySkill",
+      "issued_at": "April 2025",
+      "credential_url": ""
+    },
+    {
+      "order": 3,
+      "visible": true,
+      "title": "Google Looker Studio",
+      "image_url": "drive/sertifikat/cert-looker.jpg",
+      "issuer": "MySkill",
+      "issued_at": "April 2025",
+      "credential_url": ""
+    },
+    {
+      "order": 4,
+      "visible": true,
+      "title": "NLP Case Study: Sentiment Analysis",
+      "image_url": "drive/sertifikat/cert-nlp-project.jpg",
+      "issuer": "MySkill",
+      "issued_at": "April 2025",
+      "credential_url": ""
+    },
+    {
+      "order": 5,
+      "visible": true,
+      "title": "Project: User Segmentation",
+      "image_url": "drive/sertifikat/cert-user-seg-project.jpg",
+      "issuer": "MySkill",
+      "issued_at": "April 2025",
+      "credential_url": ""
+    },
+    {
+      "order": 6,
+      "visible": true,
+      "title": "Project: Data Visualization in Looker Data Studio",
+      "image_url": "drive/sertifikat/cert-looker-project.jpg",
+      "issuer": "MySkill",
+      "issued_at": "April 2025",
+      "credential_url": ""
+    }
+  ],
+  "experience": [
+    {
+      "order": 1,
+      "visible": true,
+      "type": "work",
+      "period": "April – Agustus 2026",
+      "title": "Administrator, SPPG Mangunan",
+      "subtitle": "",
+      "points": [
+        "Mencatat barang masuk dan keluar, memeriksa jumlah, jenis, dan kondisinya.",
+        "Memperbarui data stok dan melakukan stock opname berkala agar stok fisik cocok dengan catatan.",
+        "Menata gudang dengan sistem FIFO untuk menekan risiko barang kedaluwarsa.",
+        "Menyusun laporan stok dan aktivitas gudang secara berkala."
+      ],
+      "images": []
+    },
+    {
+      "order": 2,
+      "visible": true,
+      "type": "work",
+      "period": "Juli 2025",
+      "title": "Magang, Diskominfo Kabupaten Jombang",
+      "subtitle": "",
+      "points": [
+        "Mengelompokkan dan mengelola data secara rapi dan sistematis.",
+        "Membuat dan mempresentasikan grafik data di portal Satu Data Jombang."
+      ],
+      "images": [
+        {
+          "url": "drive/magang/magang-1.jpg",
+          "caption": "Kolaborasi pengolahan data dan pembuatan grafik saat magang di Diskominfo Kabupaten Jombang.",
+          "wide": false
+        },
+        {
+          "url": "drive/magang/magang-2.jpg",
+          "caption": "Pengolahan data menggunakan Python di ruang kerja Diskominfo Kabupaten Jombang.",
+          "wide": false
+        },
+        {
+          "url": "drive/magang/magang-3.jpg",
+          "caption": "Visualisasi grafik sebaran status gizi balita untuk portal Satu Data Jombang.",
+          "wide": true
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "visible": true,
+      "type": "education",
+      "period": "September 2022 – Agustus 2026",
+      "title": "S1 Teknik Informatika, Universitas Muhammadiyah Malang",
+      "subtitle": "IPK 3,88/4,00. Skripsi: Analisis Perbandingan Model T5, mT5, dan Baseline Abstraktif untuk Peringkasan Putusan Pengadilan Tindak Pidana Perdagangan Orang di Indonesia.",
+      "points": [],
+      "images": []
+    },
+    {
+      "order": 4,
+      "visible": true,
+      "type": "training",
+      "period": "April 2025",
+      "title": "Pelatihan MySkill",
+      "subtitle": "",
+      "points": [
+        "Certificate of Skill Specialization: Python for Data Science, Python for Data Analysis, dan Google Looker Studio.",
+        "Certificate of Course Completion: NLP Case Study: Sentiment Analysis, Project: User Segmentation, dan Project: Data Visualization in Looker Data Studio."
+      ],
+      "images": []
+    }
+  ],
+  "publications": [
+    {
+      "order": 1,
+      "visible": true,
+      "title": "Abstractive Summarization for Indonesian Human Trafficking Court Decisions Using Transformer Models",
+      "venue": "JITK Vol. 11 No. 4",
+      "date": "Mei 2026",
+      "url": "https://doi.org/10.33480/jitk.v11i4.8221"
+    }
+  ],
+  "skills": [
+    {
+      "order": 1,
+      "visible": true,
+      "name": "Python",
+      "icon_url": ""
+    },
+    {
+      "order": 2,
+      "visible": true,
+      "name": "Google Colab",
+      "icon_url": ""
+    },
+    {
+      "order": 3,
+      "visible": true,
+      "name": "Visual Studio Code",
+      "icon_url": ""
+    },
+    {
+      "order": 4,
+      "visible": true,
+      "name": "Google Looker Studio",
+      "icon_url": ""
+    },
+    {
+      "order": 5,
+      "visible": true,
+      "name": "Microsoft Excel",
+      "icon_url": ""
+    },
+    {
+      "order": 6,
+      "visible": true,
+      "name": "Microsoft Word",
+      "icon_url": ""
+    },
+    {
+      "order": 7,
+      "visible": true,
+      "name": "Microsoft PowerPoint",
+      "icon_url": ""
+    }
+  ]
+}

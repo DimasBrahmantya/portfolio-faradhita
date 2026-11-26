@@ -1,0 +1,234 @@
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ============================================================================
+   Design System Tokens — Figcraft (/design/exports/00-design-system.png..09)
+   Dial: ENERGY 2 / RHYTHM 3 / MOTION 1
+   Light: Alabaster Editorial | Dark: Deep Slate Analytical
+   ============================================================================ */
+:root {
+  /* Core Palette — Mode Terang (Alabaster Editorial) */
+  --bg: #f6f3ee;
+  --surf: #ffffff;
+  --soft: #e5f0f1;
+  --ink: #121d26;
+  --mute: #4c5b66;
+  --line: #e2ddd5;
+  --teal: #0b6168;
+  --acc: #a61d35;
+  --acc-btn: #a61d35;
+  --acc-btn-hover: #89162b;
+
+  /* Interactive & Feedback States */
+  --error-bg: #fdf2f4;
+  --error-border: #d98292;
+  --success-bg: #e5f0f1;
+  --success-border: #0b6168;
+  --disabled-bg: #e8e4dd;
+  --input-bg: #f6f3ee;
+
+  /* Editorial Dark Band (Contact / Footer / Lightbox) */
+  --footer-bg: #0e171e;
+  --footer-surf: #16232d;
+  --footer-ink: #edf2f5;
+  --footer-mute: #a4b5c2;
+  --footer-line: #253744;
+
+  /* Radii & Spacing Tokens */
+  --radius-chip: 6px;
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-panel: 16px;
+  --tap-min: 44px;
+
+  /* Elevation / Shadows (subtle editorial depth) */
+  --shadow-card: 0 1px 2px rgba(18, 29, 38, 0.04);
+  --shadow-elevated: 0 10px 28px rgba(18, 29, 38, 0.09);
+  --shadow-dialog: 0 20px 50px rgba(14, 23, 30, 0.45);
+
+  /* Glassmorphism Navbar Tokens */
+  --glass-bg: rgba(246, 243, 238, 0.62);
+  --glass-bg-scrolled: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.65);
+  --glass-border-outer: rgba(18, 29, 38, 0.09);
+  --glass-shadow: 0 8px 32px rgba(18, 29, 38, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e171e;
+    --surf: #16232d;
+    --soft: #17323b;
+    --ink: #edf2f5;
+    --mute: #a4b5c2;
+    --line: #253744;
+    --teal: #58c9d1;
+    --acc: #ff7a8e;
+    --acc-btn: #c92a45;
+    --acc-btn-hover: #ad2139;
+
+    --error-bg: #2a161c;
+    --error-border: #ff7a8e;
+    --success-bg: #17323b;
+    --success-border: #58c9d1;
+    --disabled-bg: #1f2f3b;
+    --input-bg: #0e171e;
+
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow-elevated: 0 12px 30px rgba(0, 0, 0, 0.4);
+    --shadow-dialog: 0 24px 60px rgba(0, 0, 0, 0.65);
+
+    --glass-bg: rgba(14, 23, 30, 0.58);
+    --glass-bg-scrolled: rgba(22, 35, 45, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-border-outer: rgba(88, 201, 209, 0.16);
+    --glass-shadow: 0 10px 34px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0e171e;
+  --surf: #16232d;
+  --soft: #17323b;
+  --ink: #edf2f5;
+  --mute: #a4b5c2;
+  --line: #253744;
+  --teal: #58c9d1;
+  --acc: #ff7a8e;
+  --acc-btn: #c92a45;
+  --acc-btn-hover: #ad2139;
+
+  --error-bg: #2a161c;
+  --error-border: #ff7a8e;
+  --success-bg: #17323b;
+  --success-border: #58c9d1;
+  --disabled-bg: #1f2f3b;
+  --input-bg: #0e171e;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-elevated: 0 12px 30px rgba(0, 0, 0, 0.4);
+  --shadow-dialog: 0 24px 60px rgba(0, 0, 0, 0.65);
+
+  --glass-bg: rgba(14, 23, 30, 0.58);
+  --glass-bg-scrolled: rgba(22, 35, 45, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-border-outer: rgba(88, 201, 209, 0.16);
+  --glass-shadow: 0 10px 34px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 84px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Focus ring: 3px solid Core Teal (WCAG AA keyboard visibility) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 3px;
+}
+
+/* ============================================================================
+   Motion & Entrance Animations (GPU-accelerated, reduced-motion safe)
+   ============================================================================ */
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes heroScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+}
+
+@keyframes navSlideDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-hero-fade-up {
+  animation: heroFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-hero-scale-in {
+  animation: heroScaleIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-nav-slide-down {
+  animation: navSlideDown 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.glass-navbar {
+  background: var(--glass-bg);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-color: var(--glass-border-outer);
+}
+
+.glass-navbar-scrolled {
+  background: var(--glass-bg-scrolled);
+  box-shadow: var(--glass-shadow);
+  border-color: var(--glass-border-outer);
+}
