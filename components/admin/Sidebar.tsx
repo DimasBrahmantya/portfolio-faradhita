@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -46,6 +46,17 @@ export function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileOpen]);
+
   const handleNavClick = (
     event: React.MouseEvent<HTMLAnchorElement>,
     href: string
@@ -87,7 +98,7 @@ export function Sidebar() {
           <button
             type="button"
             onClick={() => setMobileOpen(false)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--line)] text-[var(--ink)] lg:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--line)] text-[var(--ink)] lg:hidden"
             aria-label="Tutup menu"
           >
             <X className="h-4 w-4" aria-hidden="true" />
@@ -172,8 +183,9 @@ export function Sidebar() {
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--line)] text-[var(--ink)]"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--line)] text-[var(--ink)]"
             aria-label="Buka menu navigasi"
+            aria-expanded={mobileOpen}
           >
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -199,7 +211,12 @@ export function Sidebar() {
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 flex lg:hidden">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu navigasi admin"
+          className="fixed inset-0 z-40 flex lg:hidden"
+        >
           <div
             className="fixed inset-0 bg-black/50"
             onClick={() => setMobileOpen(false)}

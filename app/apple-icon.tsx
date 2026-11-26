@@ -23,18 +23,21 @@ export default function AppleIcon() {
           border: '4px solid rgba(255, 241, 245, 0.5)',
         }}
       >
-        <div
+        <svg
+          width="32"
+          height="32"
+          viewBox="0 0 24 24"
           style={{
             position: 'absolute',
-            top: 22,
+            top: 24,
             right: 26,
-            fontSize: 34,
-            color: '#fff7fa',
-            display: 'flex',
           }}
         >
-          ✦
-        </div>
+          <path
+            d="M12 1L14.8 9.2L23 12L14.8 14.8L12 23L9.2 14.8L1 12L9.2 9.2L12 1Z"
+            fill="#fff7fa"
+          />
+        </svg>
         <div
           style={{
             fontFamily: 'Georgia, serif',

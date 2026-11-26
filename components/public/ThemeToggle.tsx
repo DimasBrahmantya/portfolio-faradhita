@@ -51,7 +51,7 @@ export function ThemeToggle() {
       title={isDark ? 'Ubah ke mode terang' : 'Ubah ke mode gelap'}
       aria-label={isDark ? 'Ubah ke mode terang' : 'Ubah ke mode gelap'}
       aria-pressed={isDark}
-      className="group relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line)]/80 bg-[var(--surf)]/75 text-[var(--teal)] backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-[var(--teal)] hover:bg-[var(--soft)]/80 active:scale-95"
+      className="group relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--line)]/80 bg-[var(--surf)]/75 text-[var(--teal)] backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-[var(--teal)] hover:bg-[var(--soft)]/80 active:scale-95"
     >
       <span
         aria-hidden="true"

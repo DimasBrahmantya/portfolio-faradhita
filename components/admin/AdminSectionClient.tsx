@@ -18,8 +18,30 @@ export function AdminSectionClient({ section }: { section: AdminSectionSlug }) {
 
   if (loading && !content) {
     return (
-      <div className="rounded-[var(--radius-panel)] border border-[var(--line)] bg-[var(--surf)] p-8 text-sm text-[var(--mute)]">
-        Memuat data dari Google Sheets…
+      <div
+        aria-busy="true"
+        aria-label="Memuat data dari Google Sheets"
+        className="space-y-6"
+      >
+        <div className="space-y-2">
+          <div className="h-3.5 w-32 animate-pulse rounded bg-[var(--soft)]" />
+          <div className="h-8 w-64 animate-pulse rounded-lg bg-[var(--line)]" />
+        </div>
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+          <div className="space-y-3 rounded-[var(--radius-panel)] border border-[var(--line)] bg-[var(--surf)] p-5 xl:col-span-5">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="h-16 w-full animate-pulse rounded-[var(--radius-card)] bg-[var(--bg)]"
+              />
+            ))}
+          </div>
+          <div className="space-y-4 rounded-[var(--radius-panel)] border border-[var(--line)] bg-[var(--surf)] p-6 xl:col-span-7">
+            <div className="h-6 w-48 animate-pulse rounded bg-[var(--line)]" />
+            <div className="h-11 w-full animate-pulse rounded-[var(--radius-control)] bg-[var(--bg)]" />
+            <div className="h-24 w-full animate-pulse rounded-[var(--radius-control)] bg-[var(--bg)]" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -37,7 +59,7 @@ export function AdminSectionClient({ section }: { section: AdminSectionSlug }) {
               Gagal memuat data dari Google Sheets
             </h2>
             <p className="mt-1 text-sm">
-              {error || 'Pastikan GAS_URL dan GAS_SECRET di .env.local sudah benar.'}
+              {error || 'Pastikan konfigurasi koneksi Google Apps Script di server sudah benar.'}
             </p>
             <button
               type="button"

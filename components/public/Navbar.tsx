@@ -147,7 +147,7 @@ export function Navbar({ logoText, links }: NavbarProps) {
                 aria-expanded={menuOpen}
                 aria-controls="mobile-nav-menu"
                 aria-label={menuOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line)]/80 bg-[var(--surf)]/75 text-[var(--ink)] backdrop-blur-md transition-colors hover:border-[var(--teal)] md:hidden"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--line)]/80 bg-[var(--surf)]/75 text-[var(--ink)] backdrop-blur-md transition-colors hover:border-[var(--teal)] md:hidden"
               >
                 {menuOpen ? (
                   <X className="h-5 w-5" aria-hidden="true" />

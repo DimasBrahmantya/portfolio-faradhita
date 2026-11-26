@@ -11,6 +11,7 @@ import { ExperienceSection } from '@/components/public/ExperienceSection';
 import { Certificates } from '@/components/public/Certificates';
 import { Skills } from '@/components/public/Skills';
 import { ContactFooter } from '@/components/public/ContactFooter';
+import { EmptyState } from '@/components/public/EmptyState';
 import { ErrorFallback } from '@/components/public/ErrorFallback';
 import type { ContentBundle } from '@/types/content';
 
@@ -265,9 +266,17 @@ export default async function HomePage() {
           <Hero
             profile={profile}
             facts={facts}
+            hasAbout={hasAbout}
             hasProjects={hasProjects}
             hasContact={hasContact}
           />
+
+          {!hasAbout &&
+            !hasProjects &&
+            !hasExperience &&
+            !hasCertificates &&
+            !hasSkills &&
+            !hasContact && <EmptyState />}
 
           {hasAbout && <About profile={profile} facts={facts} />}
 

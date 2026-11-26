@@ -7,13 +7,21 @@ import { SafeImage } from './SafeImage';
 interface HeroProps {
   profile: Profile;
   facts: Fact[];
+  hasAbout?: boolean;
   hasProjects: boolean;
   hasContact: boolean;
 }
 
-export function Hero({ profile, facts, hasProjects, hasContact }: HeroProps) {
+export function Hero({
+  profile,
+  facts,
+  hasAbout = true,
+  hasProjects,
+  hasContact,
+}: HeroProps) {
   const fullName = [profile.full_name_1, profile.full_name_2].filter(Boolean).join(' ') || 'Faradhita Eka Septiana';
   const eyebrowParts = [profile.location, profile.role.split('·')[0]?.trim()].filter(Boolean);
+  const hasPrimaryTarget = hasProjects || hasAbout;
   const primaryHref = hasProjects ? '#project' : '#tentang';
   const whatsappHref = safeHref(profile.whatsapp_url);
   const secondaryHref = hasContact ? '#kontak' : whatsappHref || '#tentang';
@@ -83,30 +91,34 @@ export function Hero({ profile, facts, hasProjects, hasContact }: HeroProps) {
             </p>
           )}
 
-          <div
-            className="animate-hero-fade-up mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"
-            style={{ animationDelay: '260ms' }}
-          >
-            <a
-              href={primaryHref}
-              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-[var(--acc-btn)] px-6 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[var(--acc-btn-hover)] hover:shadow-md active:translate-y-0"
+          {(hasPrimaryTarget || hasContact || whatsappHref) && (
+            <div
+              className="animate-hero-fade-up mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"
+              style={{ animationDelay: '260ms' }}
             >
-              <span>{profile.hero_cta_primary || 'Lihat Project'}</span>
-              <ArrowDownRight className="h-4 w-4" aria-hidden="true" />
-            </a>
+              {hasPrimaryTarget && (
+                <a
+                  href={primaryHref}
+                  className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-[var(--acc-btn)] px-6 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[var(--acc-btn-hover)] hover:shadow-md active:translate-y-0"
+                >
+                  <span>{profile.hero_cta_primary || 'Lihat Project'}</span>
+                  <ArrowDownRight className="h-4 w-4" aria-hidden="true" />
+                </a>
+              )}
 
-            {(hasContact || whatsappHref) && (
-              <a
-                href={secondaryHref}
-                target={secondaryIsExternal ? '_blank' : undefined}
-                rel={secondaryIsExternal ? 'noopener noreferrer' : undefined}
-                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-[var(--ink)]/30 bg-[var(--surf)] px-6 py-2.5 text-sm font-semibold text-[var(--ink)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--teal)] hover:text-[var(--teal)] hover:shadow-sm active:translate-y-0"
-              >
-                <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                <span>{profile.hero_cta_secondary || 'Hubungi Saya'}</span>
-              </a>
-            )}
-          </div>
+              {(hasContact || whatsappHref) && (
+                <a
+                  href={secondaryHref}
+                  target={secondaryIsExternal ? '_blank' : undefined}
+                  rel={secondaryIsExternal ? 'noopener noreferrer' : undefined}
+                  className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-[var(--ink)]/30 bg-[var(--surf)] px-6 py-2.5 text-sm font-semibold text-[var(--ink)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--teal)] hover:text-[var(--teal)] hover:shadow-sm active:translate-y-0"
+                >
+                  <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                  <span>{profile.hero_cta_secondary || 'Hubungi Saya'}</span>
+                </a>
+              )}
+            </div>
+          )}
 
           {facts.length > 0 && (
             <dl
@@ -116,7 +128,7 @@ export function Hero({ profile, facts, hasProjects, hasContact }: HeroProps) {
               {facts.map((fact) => (
                 <div
                   key={fact.id}
-                  className="rounded-xl border border-[var(--line)] bg-[var(--surf)] p-3.5 transition-transform duration-300 hover:-translate-y-0.5 sm:border-0 sm:bg-transparent sm:p-0"
+                  className="flex flex-col rounded-xl border border-[var(--line)] bg-[var(--surf)] p-3.5 transition-transform duration-300 hover:-translate-y-0.5 sm:border-0 sm:bg-transparent sm:p-0"
                 >
                   <dt className="order-2 mt-1 text-xs leading-snug text-[var(--mute)] sm:text-sm">
                     {fact.label}
