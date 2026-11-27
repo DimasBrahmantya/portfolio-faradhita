@@ -52,7 +52,8 @@ export async function gasGet<T extends GasBaseResponse>(
   options: GasGetOptions = {}
 ): Promise<T> {
   const { url, secret } = getGasConfig();
-  const target = `${url}?action=${encodeURIComponent(action)}&secret=${encodeURIComponent(secret)}`;
+  const readSecret = process.env.GAS_READ_SECRET?.trim() || secret;
+  const target = `${url}?action=${encodeURIComponent(action)}&secret=${encodeURIComponent(readSecret)}`;
 
   const fetchInit: RequestInit = {
     method: 'GET',

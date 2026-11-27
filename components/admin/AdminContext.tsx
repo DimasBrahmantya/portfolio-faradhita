@@ -15,7 +15,7 @@ interface AdminContextValue {
   loading: boolean;
   error: string | null;
   isDirty: boolean;
-  setIsDirty: (dirty: boolean) => void;
+  setIsDirty: (dirty: boolean, source?: string) => void;
   setContent: React.Dispatch<React.SetStateAction<ContentBundle | null>>;
   refreshContent: () => Promise<void>;
   confirmDiscardIfDirty: () => boolean;
@@ -35,7 +35,19 @@ export function AdminProvider({
   const [content, setContent] = useState<ContentBundle | null>(initialContent);
   const [loading, setLoading] = useState(!initialContent && !initialError);
   const [error, setError] = useState<string | null>(initialError);
-  const [isDirty, setIsDirty] = useState(false);
+  const [dirtySources, setDirtySources] = useState<Set<string>>(() => new Set());
+  const isDirty = dirtySources.size > 0;
+
+  const setIsDirty = useCallback((dirty: boolean, source = 'main') => {
+    setDirtySources((prev) => {
+      const has = prev.has(source);
+      if (dirty === has) return prev;
+      const next = new Set(prev);
+      if (dirty) next.add(source);
+      else next.delete(source);
+      return next;
+    });
+  }, []);
 
   const refreshContent = useCallback(async () => {
     setLoading(true);
@@ -74,7 +86,7 @@ export function AdminProvider({
       'Ada perubahan yang belum disimpan. Yakin ingin meninggalkan halaman ini?'
     );
     if (confirmed) {
-      setIsDirty(false);
+      setDirtySources(new Set());
     }
     return confirmed;
   }, [isDirty]);
@@ -90,7 +102,7 @@ export function AdminProvider({
       refreshContent,
       confirmDiscardIfDirty,
     }),
-    [content, loading, error, isDirty, refreshContent, confirmDiscardIfDirty]
+    [content, loading, error, isDirty, setIsDirty, refreshContent, confirmDiscardIfDirty]
   );
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;

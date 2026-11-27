@@ -5,6 +5,7 @@ import { gasGet, isGasConfigured } from '@/lib/gas';
 import { cleanIsoDates } from '@/lib/date';
 import { safeHref, safeImageUrl } from '@/lib/url';
 import { normalizeSiteText } from '@/lib/site-text';
+import { resolveUniqueSlug } from '@/lib/validation';
 import type {
   Certificate,
   ContentBundle,
@@ -298,17 +299,20 @@ function parseCustomSectionCards(raw: unknown): CustomSectionCard[] {
 function normalizeCustomSections(raw: unknown): CustomSection[] {
   const parsed = safeJsonParse(raw);
   if (!Array.isArray(parsed)) return [];
+  const usedSlugs = new Set<string>();
   return parsed
     .filter(isRecord)
     .map((item, idx) => {
       const id = asString(item.id).trim();
       const heading = asString(item.heading).trim();
       const rawSlug = asString(item.slug).trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+      const slug = resolveUniqueSlug(rawSlug || `section-${id || idx + 1}`, usedSlugs);
+      usedSlugs.add(slug);
       return {
         id,
         order: asOrder(item.order, idx + 1),
         visible: asVisible(item.visible),
-        slug: rawSlug || `section-${id || idx + 1}`,
+        slug,
         nav_label: asString(item.nav_label).trim(),
         show_in_nav: item.show_in_nav !== false,
         placement: normalizePlacement(item.placement),

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { IBM_Plex_Mono, Playfair_Display, Source_Sans_3 } from 'next/font/google';
+import { SITE_URL } from '@/lib/url';
 import './globals.css';
 
 const playfair = Playfair_Display({
@@ -23,9 +24,7 @@ const ibmPlexMono = IBM_Plex_Mono({
   display: 'swap',
 });
 
-const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://faradhita.vercel.app'
-).replace(/\/+$/, '');
+const siteUrl = SITE_URL;
 const googleVerification =
   process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim() ||
   'xldoMSdwb1lUUzyqGUUnoJ1GeaNZkuhFRvzv9ikFwdA';

@@ -34,12 +34,22 @@ export function safeComparePassword(input: string, expected: string): boolean {
 }
 
 export function getClientIp(request: Request): string {
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) {
-    const first = forwarded.split(',')[0]?.trim();
-    if (first) return first;
-  }
+  // Prefer proxy-set headers over client-spoofable leftmost x-forwarded-for.
+  const vercelIp = request.headers.get('x-vercel-forwarded-for')?.split(',')[0]?.trim();
+  if (vercelIp) return vercelIp;
+
   const realIp = request.headers.get('x-real-ip')?.trim();
   if (realIp) return realIp;
+
+  const forwarded = request.headers.get('x-forwarded-for');
+  if (forwarded) {
+    const parts = forwarded
+      .split(',')
+      .map((part) => part.trim())
+      .filter(Boolean);
+    const rightmost = parts[parts.length - 1];
+    if (rightmost) return rightmost;
+  }
+
   return 'unknown';
 }

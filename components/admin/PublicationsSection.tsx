@@ -5,8 +5,6 @@ import { Plus } from 'lucide-react';
 import { useAdminContext } from '@/components/admin/AdminContext';
 import {
   apiCreateItem,
-  apiDeleteItem,
-  apiReorderItems,
   apiUpdateItem,
 } from '@/components/admin/api';
 import { ItemList } from '@/components/admin/ItemList';
@@ -14,6 +12,7 @@ import {
   PublicationForm,
   type PublicationFormPayload,
 } from '@/components/admin/PublicationForm';
+import { useSheetListActions } from '@/components/admin/useSheetListActions';
 import type { Publication } from '@/types/content';
 
 export function PublicationsSection() {
@@ -24,9 +23,17 @@ export function PublicationsSection() {
     publications[0]?.id ?? null
   );
   const [creating, setCreating] = useState(publications.length === 0);
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [reordering, setReordering] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const {
+    busyId,
+    reordering,
+    errorMsg,
+    setErrorMsg,
+    handleToggleVisible,
+    handleDelete,
+    handleMove,
+  } = useSheetListActions('Publications', 'publications', (deletedId) => {
+    if (selectedId === deletedId) setSelectedId(null);
+  });
 
   useEffect(() => {
     return () => setIsDirty(false);
@@ -70,75 +77,6 @@ export function PublicationsSection() {
           }
         : prev
     );
-  };
-
-  const handleToggleVisible = async (item: Publication, nextVisible: boolean) => {
-    setBusyId(item.id);
-    setErrorMsg(null);
-    try {
-      await apiUpdateItem('Publications', item.id, { visible: nextVisible });
-      setContent((prev) =>
-        prev
-          ? {
-              ...prev,
-              publications: prev.publications.map((p) =>
-                p.id === item.id ? { ...p, visible: nextVisible } : p
-              ),
-            }
-          : prev
-      );
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal mengubah status.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const handleDelete = async (item: Publication) => {
-    setBusyId(item.id);
-    setErrorMsg(null);
-    try {
-      await apiDeleteItem('Publications', item.id);
-      setContent((prev) =>
-        prev
-          ? {
-              ...prev,
-              publications: prev.publications.filter((p) => p.id !== item.id),
-            }
-          : prev
-      );
-      if (selectedId === item.id) {
-        setSelectedId(null);
-      }
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal menghapus publikasi.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const handleMove = async (index: number, direction: 'up' | 'down') => {
-    const swapIdx = direction === 'up' ? index - 1 : index + 1;
-    if (swapIdx < 0 || swapIdx >= publications.length) return;
-
-    const next = [...publications];
-    const [moved] = next.splice(index, 1);
-    next.splice(swapIdx, 0, moved);
-    const reindexed = next.map((item, idx) => ({ ...item, order: idx + 1 }));
-
-    setReordering(true);
-    setErrorMsg(null);
-    try {
-      await apiReorderItems(
-        'Publications',
-        reindexed.map((item) => item.id)
-      );
-      setContent((prev) => (prev ? { ...prev, publications: reindexed } : prev));
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal menyimpan urutan.');
-    } finally {
-      setReordering(false);
-    }
   };
 
   return (

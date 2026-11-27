@@ -8,6 +8,7 @@ interface RateLimitEntry {
 const WINDOW_MS = 10 * 60 * 1000; // 10 menit
 const MAX_FAILURES = 5;
 
+// shortcut: in-memory per serverless instance, move to Redis/Upstash KV if brute-force traffic grows across instances
 const store = new Map<string, RateLimitEntry>();
 
 function pruneExpired(now: number): void {

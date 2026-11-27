@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
-import { safeHref } from '@/lib/url';
+import { safeHref, SITE_URL } from '@/lib/url';
 import { Navbar, type NavLinkItem } from '@/components/public/Navbar';
 import { LightboxProvider } from '@/components/public/Lightbox';
 import { Hero } from '@/components/public/Hero';
@@ -18,9 +18,7 @@ import type { ContentBundle } from '@/types/content';
 
 export const revalidate = 300;
 
-const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://faradhita.vercel.app'
-).replace(/\/+$/, '');
+const siteUrl = SITE_URL;
 
 function buildStructuredData(bundle: ContentBundle) {
   const { profile, skills, experience, certificates, publications } = bundle;

@@ -5,8 +5,6 @@ import { Plus } from 'lucide-react';
 import { useAdminContext } from '@/components/admin/AdminContext';
 import {
   apiCreateItem,
-  apiDeleteItem,
-  apiReorderItems,
   apiUpdateItem,
 } from '@/components/admin/api';
 import {
@@ -14,6 +12,7 @@ import {
   type CertificateFormPayload,
 } from '@/components/admin/CertificateForm';
 import { ItemList } from '@/components/admin/ItemList';
+import { useSheetListActions } from '@/components/admin/useSheetListActions';
 import type { Certificate } from '@/types/content';
 
 export function CertificatesSection() {
@@ -24,9 +23,17 @@ export function CertificatesSection() {
     certificates[0]?.id ?? null
   );
   const [creating, setCreating] = useState(certificates.length === 0);
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [reordering, setReordering] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const {
+    busyId,
+    reordering,
+    errorMsg,
+    setErrorMsg,
+    handleToggleVisible,
+    handleDelete,
+    handleMove,
+  } = useSheetListActions('Certificates', 'certificates', (deletedId) => {
+    if (selectedId === deletedId) setSelectedId(null);
+  });
 
   useEffect(() => {
     return () => setIsDirty(false);
@@ -71,75 +78,6 @@ export function CertificatesSection() {
           }
         : prev
     );
-  };
-
-  const handleToggleVisible = async (item: Certificate, nextVisible: boolean) => {
-    setBusyId(item.id);
-    setErrorMsg(null);
-    try {
-      await apiUpdateItem('Certificates', item.id, { visible: nextVisible });
-      setContent((prev) =>
-        prev
-          ? {
-              ...prev,
-              certificates: prev.certificates.map((c) =>
-                c.id === item.id ? { ...c, visible: nextVisible } : c
-              ),
-            }
-          : prev
-      );
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal mengubah status.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const handleDelete = async (item: Certificate) => {
-    setBusyId(item.id);
-    setErrorMsg(null);
-    try {
-      await apiDeleteItem('Certificates', item.id);
-      setContent((prev) =>
-        prev
-          ? {
-              ...prev,
-              certificates: prev.certificates.filter((c) => c.id !== item.id),
-            }
-          : prev
-      );
-      if (selectedId === item.id) {
-        setSelectedId(null);
-      }
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal menghapus sertifikat.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const handleMove = async (index: number, direction: 'up' | 'down') => {
-    const swapIdx = direction === 'up' ? index - 1 : index + 1;
-    if (swapIdx < 0 || swapIdx >= certificates.length) return;
-
-    const next = [...certificates];
-    const [moved] = next.splice(index, 1);
-    next.splice(swapIdx, 0, moved);
-    const reindexed = next.map((item, idx) => ({ ...item, order: idx + 1 }));
-
-    setReordering(true);
-    setErrorMsg(null);
-    try {
-      await apiReorderItems(
-        'Certificates',
-        reindexed.map((item) => item.id)
-      );
-      setContent((prev) => (prev ? { ...prev, certificates: reindexed } : prev));
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal menyimpan urutan.');
-    } finally {
-      setReordering(false);
-    }
   };
 
   return (

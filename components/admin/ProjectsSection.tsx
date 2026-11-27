@@ -5,8 +5,6 @@ import { Plus } from 'lucide-react';
 import { useAdminContext } from '@/components/admin/AdminContext';
 import {
   apiCreateItem,
-  apiDeleteItem,
-  apiReorderItems,
   apiUpdateItem,
 } from '@/components/admin/api';
 import { ItemList } from '@/components/admin/ItemList';
@@ -14,6 +12,7 @@ import {
   ProjectForm,
   type ProjectFormPayload,
 } from '@/components/admin/ProjectForm';
+import { useSheetListActions } from '@/components/admin/useSheetListActions';
 import type { Project } from '@/types/content';
 
 export function ProjectsSection() {
@@ -22,9 +21,19 @@ export function ProjectsSection() {
 
   const [mode, setMode] = useState<'list' | 'create' | 'edit'>('list');
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [reordering, setReordering] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const {
+    busyId,
+    reordering,
+    errorMsg,
+    handleToggleVisible,
+    handleDelete,
+    handleMove,
+  } = useSheetListActions('Projects', 'projects', (deletedId) => {
+    if (editingId === deletedId) {
+      setEditingId(null);
+      setMode('list');
+    }
+  });
 
   useEffect(() => {
     return () => setIsDirty(false);
@@ -70,73 +79,6 @@ export function ProjectsSection() {
           }
         : prev
     );
-  };
-
-  const handleToggleVisible = async (item: Project, nextVisible: boolean) => {
-    setBusyId(item.id);
-    setErrorMsg(null);
-    try {
-      await apiUpdateItem('Projects', item.id, { visible: nextVisible });
-      setContent((prev) =>
-        prev
-          ? {
-              ...prev,
-              projects: prev.projects.map((p) =>
-                p.id === item.id ? { ...p, visible: nextVisible } : p
-              ),
-            }
-          : prev
-      );
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal mengubah status.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const handleDelete = async (item: Project) => {
-    setBusyId(item.id);
-    setErrorMsg(null);
-    try {
-      await apiDeleteItem('Projects', item.id);
-      setContent((prev) =>
-        prev
-          ? { ...prev, projects: prev.projects.filter((p) => p.id !== item.id) }
-          : prev
-      );
-      if (editingId === item.id) {
-        setEditingId(null);
-        setMode('list');
-      }
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal menghapus project.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const handleMove = async (index: number, direction: 'up' | 'down') => {
-    const swapIdx = direction === 'up' ? index - 1 : index + 1;
-    if (swapIdx < 0 || swapIdx >= projects.length) return;
-
-    const next = [...projects];
-    const [moved] = next.splice(index, 1);
-    next.splice(swapIdx, 0, moved);
-    const reindexed = next.map((item, idx) => ({ ...item, order: idx + 1 }));
-
-    setReordering(true);
-    setErrorMsg(null);
-    try {
-      await apiReorderItems(
-        'Projects',
-        reindexed.map((item) => item.id)
-      );
-      setContent((prev) => (prev ? { ...prev, projects: reindexed } : prev));
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal menyimpan urutan.');
-    } finally {
-      setReordering(false);
-    }
   };
 
   if (mode === 'create' || mode === 'edit') {

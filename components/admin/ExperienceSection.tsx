@@ -5,8 +5,6 @@ import { Plus } from 'lucide-react';
 import { useAdminContext } from '@/components/admin/AdminContext';
 import {
   apiCreateItem,
-  apiDeleteItem,
-  apiReorderItems,
   apiUpdateItem,
 } from '@/components/admin/api';
 import {
@@ -14,6 +12,7 @@ import {
   type ExperienceFormPayload,
 } from '@/components/admin/ExperienceForm';
 import { ItemList } from '@/components/admin/ItemList';
+import { useSheetListActions } from '@/components/admin/useSheetListActions';
 import type { Experience, ExperienceType } from '@/types/content';
 
 const TYPE_LABEL: Record<ExperienceType, string> = {
@@ -30,9 +29,17 @@ export function ExperienceSection() {
     experiences[0]?.id ?? null
   );
   const [creating, setCreating] = useState(experiences.length === 0);
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [reordering, setReordering] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const {
+    busyId,
+    reordering,
+    errorMsg,
+    setErrorMsg,
+    handleToggleVisible,
+    handleDelete,
+    handleMove,
+  } = useSheetListActions('Experience', 'experience', (deletedId) => {
+    if (selectedId === deletedId) setSelectedId(null);
+  });
 
   useEffect(() => {
     return () => setIsDirty(false);
@@ -76,75 +83,6 @@ export function ExperienceSection() {
           }
         : prev
     );
-  };
-
-  const handleToggleVisible = async (item: Experience, nextVisible: boolean) => {
-    setBusyId(item.id);
-    setErrorMsg(null);
-    try {
-      await apiUpdateItem('Experience', item.id, { visible: nextVisible });
-      setContent((prev) =>
-        prev
-          ? {
-              ...prev,
-              experience: prev.experience.map((e) =>
-                e.id === item.id ? { ...e, visible: nextVisible } : e
-              ),
-            }
-          : prev
-      );
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal mengubah status.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const handleDelete = async (item: Experience) => {
-    setBusyId(item.id);
-    setErrorMsg(null);
-    try {
-      await apiDeleteItem('Experience', item.id);
-      setContent((prev) =>
-        prev
-          ? {
-              ...prev,
-              experience: prev.experience.filter((e) => e.id !== item.id),
-            }
-          : prev
-      );
-      if (selectedId === item.id) {
-        setSelectedId(null);
-      }
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal menghapus pengalaman.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const handleMove = async (index: number, direction: 'up' | 'down') => {
-    const swapIdx = direction === 'up' ? index - 1 : index + 1;
-    if (swapIdx < 0 || swapIdx >= experiences.length) return;
-
-    const next = [...experiences];
-    const [moved] = next.splice(index, 1);
-    next.splice(swapIdx, 0, moved);
-    const reindexed = next.map((item, idx) => ({ ...item, order: idx + 1 }));
-
-    setReordering(true);
-    setErrorMsg(null);
-    try {
-      await apiReorderItems(
-        'Experience',
-        reindexed.map((item) => item.id)
-      );
-      setContent((prev) => (prev ? { ...prev, experience: reindexed } : prev));
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal menyimpan urutan.');
-    } finally {
-      setReordering(false);
-    }
   };
 
   return (

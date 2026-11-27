@@ -1,3 +1,7 @@
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://faradhita.vercel.app'
+).replace(/\/+$/, '');
+
 const ALLOWED_PROTOCOLS = new Set(['http:', 'https:', 'mailto:', 'tel:']);
 const ALLOWED_HTTP_PROTOCOLS = new Set(['http:', 'https:']);
 
@@ -74,10 +78,4 @@ export function getDriveImageCandidates(url: string): string[] {
 
   // Keep unique order, preferring thumbnail (most reliable in browsers) then lh3 then uc
   return Array.from(new Set(candidates));
-}
-
-export function getDriveFallbackUrl(url: string): string | null {
-  const candidates = getDriveImageCandidates(url);
-  const next = candidates.find((candidate) => candidate !== url);
-  return next ?? null;
 }

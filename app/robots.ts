@@ -1,10 +1,7 @@
 import type { MetadataRoute } from 'next';
+import { SITE_URL } from '@/lib/url';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = (
-    process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://faradhita.vercel.app'
-  ).replace(/\/+$/, '');
-
   return {
     rules: [
       {
@@ -13,6 +10,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin', '/admin/', '/api/'],
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

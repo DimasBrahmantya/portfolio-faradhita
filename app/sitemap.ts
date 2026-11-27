@@ -1,13 +1,10 @@
 import type { MetadataRoute } from 'next';
+import { SITE_URL } from '@/lib/url';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = (
-    process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://faradhita.vercel.app'
-  ).replace(/\/+$/, '');
-
   return [
     {
-      url: `${baseUrl}/`,
+      url: `${SITE_URL}/`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1,

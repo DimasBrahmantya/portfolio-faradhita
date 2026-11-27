@@ -10,6 +10,7 @@ import {
   type CustomSectionFormPayload,
 } from '@/components/admin/CustomSectionForm';
 import { ItemList } from '@/components/admin/ItemList';
+import { resolveUniqueSlug } from '@/lib/validation';
 import type { CustomSection } from '@/types/content';
 
 const PLACEMENT_LABEL = Object.fromEntries(
@@ -36,6 +37,7 @@ export function CustomSectionsSection() {
     [setIsDirty]
   );
 
+  // shortcut: single-owner last-write-wins JSON blob in Profile, move to dedicated sheet if multi-editor
   const persistSections = async (next: CustomSection[]) => {
     const normalized = next.map((item, idx) => ({ ...item, order: idx + 1 }));
     await apiUpdateProfile({ custom_sections: JSON.stringify(normalized) });
@@ -44,12 +46,18 @@ export function CustomSectionsSection() {
   };
 
   const handleSave = async (payload: CustomSectionFormPayload) => {
+    const otherSlugs = sections
+      .filter((item) => item.id !== editingSection?.id)
+      .map((item) => item.slug);
+    const uniqueSlug = resolveUniqueSlug(payload.slug, otherSlugs);
+    const safePayload = { ...payload, slug: uniqueSlug };
+
     if (mode === 'create' || !editingSection) {
       const id = `sec-${Date.now().toString(36)}`;
       const created: CustomSection = {
         id,
         order: sections.length + 1,
-        ...payload,
+        ...safePayload,
       };
       await persistSections([...sections, created]);
       setEditingId(id);
@@ -58,7 +66,7 @@ export function CustomSectionsSection() {
     }
 
     const updated = sections.map((item) =>
-      item.id === editingSection.id ? { ...item, ...payload } : item
+      item.id === editingSection.id ? { ...item, ...safePayload } : item
     );
     await persistSections(updated);
   };

@@ -21,7 +21,6 @@ export interface SiteTextField {
   defaultValue: string;
   hint?: string;
   multiline?: boolean;
-  max?: number;
 }
 
 export const SITE_TEXT_FIELDS = [

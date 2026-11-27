@@ -21,7 +21,14 @@ export function SectionTextEditor({ group }: { group: SiteTextGroup }) {
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  useEffect(() => () => setIsDirty(false), [setIsDirty]);
+  useEffect(() => () => setIsDirty(false, 'section-text'), [setIsDirty]);
+
+  useEffect(() => {
+    if (dirty || !profile) return;
+    setValues(
+      Object.fromEntries(fields.map((f) => [f.key, profile[f.key] ?? f.defaultValue]))
+    );
+  }, [profile, fields, dirty]);
 
   if (fields.length === 0) return null;
 
@@ -30,7 +37,7 @@ export function SectionTextEditor({ group }: { group: SiteTextGroup }) {
   const updateField = (key: string, value: string) => {
     setValues((prev) => ({ ...prev, [key]: value }));
     setDirty(true);
-    setIsDirty(true);
+    setIsDirty(true, 'section-text');
     if (status === 'error') setStatus('idle');
   };
 
@@ -57,7 +64,7 @@ export function SectionTextEditor({ group }: { group: SiteTextGroup }) {
         prev ? { ...prev, profile: { ...prev.profile, ...applied } } : prev
       );
       setDirty(false);
-      setIsDirty(false);
+      setIsDirty(false, 'section-text');
       setStatus('saved');
       setSavedAt(formatTimeWib());
     } catch (err) {
@@ -101,7 +108,7 @@ export function SectionTextEditor({ group }: { group: SiteTextGroup }) {
             const common = {
               id: inputId,
               value: values[field.key] ?? '',
-              maxLength: field.max ?? SITE_TEXT_MAX,
+              maxLength: SITE_TEXT_MAX,
               placeholder: field.defaultValue || 'Otomatis',
               onChange: (
                 e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

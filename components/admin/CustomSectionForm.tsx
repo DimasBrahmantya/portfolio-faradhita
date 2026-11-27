@@ -142,7 +142,15 @@ export function CustomSectionForm({
     event.preventDefault();
     setErrorMsg(null);
 
-    const cleanedItems = items.filter((it) => it.title.trim().length > 0);
+    const cleanedItems = items.filter((it) =>
+      Boolean(
+        it.title.trim() ||
+          it.subtitle.trim() ||
+          it.description.trim() ||
+          it.url.trim() ||
+          it.url_label.trim()
+      )
+    );
     const cleanedImages = images.filter((img) => img.url.trim().length > 0);
     const finalSlug = slug.trim() || slugify(navLabel || heading) || `section-${Date.now()}`;
 

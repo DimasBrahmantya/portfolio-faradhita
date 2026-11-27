@@ -57,7 +57,7 @@ function authorizeDrive() {
 function doGet(e) {
   return handle_(function () {
     const p = (e && e.parameter) || {};
-    auth_(p.secret);
+    authRead_(p.secret);
     if (p.action === 'getAll') return { data: getAll_() };
     throw new Error('unknown_action');
   });
@@ -100,6 +100,11 @@ function auth_(secret) {
   if (!real || secret !== real) throw new Error('unauthorized');
 }
 
+function authRead_(secret) {
+  const real = prop_('GAS_READ_SECRET') || prop_('GAS_SECRET');
+  if (!real || secret !== real) throw new Error('unauthorized');
+}
+
 function handle_(fn) {
   try {
     return json_(Object.assign({ ok: true }, fn()));
@@ -134,7 +139,8 @@ function findRow_(sh, id) {
 }
 
 function headers_(sh) {
-  return sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
+  const lastCol = sh.getLastColumn();
+  return lastCol < 1 ? [] : sh.getRange(1, 1, 1, lastCol).getValues()[0];
 }
 
 // Tambah kolom yang terdaftar di SHEETS tapi belum ada di sheet (mis. kolom baru setelah update).
@@ -198,18 +204,35 @@ function updateProfile_(values) {
   const sh = SpreadsheetApp.getActive().getSheetByName('Profile');
   if (!sh) throw new Error('sheet_not_found: Profile');
   const last = sh.getLastRow();
-  const keys = last >= 2
-    ? sh.getRange(2, 1, last - 1, 1).getValues().map(function (r) { return String(r[0]); })
+  const existingRows = last >= 2
+    ? sh.getRange(2, 1, last - 1, 2).getValues()
     : [];
+  const keyIndex = {};
+  existingRows.forEach(function (r, idx) {
+    keyIndex[String(r[0])] = idx;
+  });
+
+  let updatedExisting = false;
+  const toAppend = [];
   Object.keys(values).forEach(function (k) {
-    const i = keys.indexOf(k);
-    if (i >= 0) {
-      sh.getRange(i + 2, 2).setValue(toCell_(values[k]));
+    const cellVal = toCell_(values[k]);
+    if (Object.prototype.hasOwnProperty.call(keyIndex, k)) {
+      existingRows[keyIndex[k]][1] = cellVal;
+      updatedExisting = true;
     } else {
-      sh.appendRow([k, toCell_(values[k])]);
-      keys.push(k);
+      toAppend.push([k, cellVal]);
+      keyIndex[k] = -1;
     }
   });
+
+  if (updatedExisting && existingRows.length > 0) {
+    const colValues = existingRows.map(function (r) { return [r[1]]; });
+    sh.getRange(2, 2, existingRows.length, 1).setNumberFormat('@').setValues(colValues);
+  }
+  if (toAppend.length > 0) {
+    const startRow = Math.max(last, 1) + 1;
+    sh.getRange(startRow, 1, toAppend.length, 2).setNumberFormat('@').setValues(toAppend);
+  }
   return {};
 }
 
@@ -221,11 +244,12 @@ function createItem_(name, item) {
   const id = Utilities.getUuid().replace(/-/g, '').slice(0, 10);
   const row = head.map(function (h) {
     if (h === 'id') return id;
-    if (h === 'order') return nextOrder;
+    if (h === 'order') return String(nextOrder);
     if (h === 'visible') return item.visible === false ? 'FALSE' : 'TRUE';
     return toCell_(item[h]);
   });
-  sh.appendRow(row);
+  const nextRow = Math.max(sh.getLastRow(), 1) + 1;
+  sh.getRange(nextRow, 1, 1, row.length).setNumberFormat('@').setValues([row]);
   return { id: id };
 }
 
@@ -234,13 +258,21 @@ function updateItem_(name, id, item) {
   const row = findRow_(sh, id);
   if (row < 0) throw new Error('not_found');
   const head = ensureColumns_(sh, name);
+  const range = sh.getRange(row, 1, 1, head.length);
+  const values = range.getValues()[0];
+  let changed = false;
   head.forEach(function (h, i) {
     if (h === 'id' || h === 'order') return;
     if (Object.prototype.hasOwnProperty.call(item, h)) {
-      const v = h === 'visible' ? (item[h] === false || item[h] === 'FALSE' ? 'FALSE' : 'TRUE') : toCell_(item[h]);
-      sh.getRange(row, i + 1).setValue(v);
+      values[i] = h === 'visible'
+        ? (item[h] === false || item[h] === 'FALSE' ? 'FALSE' : 'TRUE')
+        : toCell_(item[h]);
+      changed = true;
     }
   });
+  if (changed) {
+    range.setNumberFormat('@').setValues([values]);
+  }
   return {};
 }
 
@@ -256,10 +288,29 @@ function reorder_(name, ids) {
   const sh = sheet_(name);
   const orderCol = headers_(sh).indexOf('order') + 1;
   if (orderCol < 1) throw new Error('no_order_column');
-  ids.forEach(function (id, i) {
-    const row = findRow_(sh, id);
-    if (row > 0) sh.getRange(row, orderCol).setValue(String(i + 1));
+  const last = sh.getLastRow();
+  if (last < 2) return {};
+
+  const rowIds = sh.getRange(2, 1, last - 1, 1).getValues();
+  const rowById = {};
+  rowIds.forEach(function (r, idx) {
+    const key = String(r[0]);
+    if (key !== '') rowById[key] = idx;
   });
+
+  const orderRange = sh.getRange(2, orderCol, last - 1, 1);
+  const orderValues = orderRange.getValues();
+  let changed = false;
+  ids.forEach(function (id, i) {
+    const idx = rowById[String(id)];
+    if (idx !== undefined) {
+      orderValues[idx][0] = String(i + 1);
+      changed = true;
+    }
+  });
+  if (changed) {
+    orderRange.setNumberFormat('@').setValues(orderValues);
+  }
   return {};
 }
 

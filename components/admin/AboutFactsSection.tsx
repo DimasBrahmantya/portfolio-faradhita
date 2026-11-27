@@ -5,8 +5,6 @@ import { Plus } from 'lucide-react';
 import { useAdminContext } from '@/components/admin/AdminContext';
 import {
   apiCreateItem,
-  apiDeleteItem,
-  apiReorderItems,
   apiUpdateItem,
   apiUpdateProfile,
 } from '@/components/admin/api';
@@ -14,6 +12,7 @@ import { FactForm } from '@/components/admin/FactForm';
 import { ImageUploader } from '@/components/admin/ImageUploader';
 import { ItemList } from '@/components/admin/ItemList';
 import { formatTimeWib, SaveBar, type SaveStatus } from '@/components/admin/SaveBar';
+import { useSheetListActions } from '@/components/admin/useSheetListActions';
 import { SafeImage } from '@/components/public/SafeImage';
 import { formatZodError, profileAboutSchema } from '@/lib/validation';
 import type { Fact } from '@/types/content';
@@ -36,9 +35,17 @@ export function AboutFactsSection() {
     facts[0]?.id ?? null
   );
   const [creatingFact, setCreatingFact] = useState(false);
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [reordering, setReordering] = useState(false);
-  const [listError, setListError] = useState<string | null>(null);
+  const {
+    busyId,
+    reordering,
+    errorMsg: listError,
+    setErrorMsg: setListError,
+    handleToggleVisible,
+    handleDelete: handleDeleteFact,
+    handleMove: handleMoveFact,
+  } = useSheetListActions('Facts', 'facts', (deletedId) => {
+    if (selectedFactId === deletedId) setSelectedFactId(null);
+  });
 
   useEffect(() => {
     setIsDirty(aboutDirty || factDirty);
@@ -122,70 +129,6 @@ export function AboutFactsSection() {
           }
         : prev
     );
-  };
-
-  const handleToggleVisible = async (item: Fact, nextVisible: boolean) => {
-    setBusyId(item.id);
-    setListError(null);
-    try {
-      await apiUpdateItem('Facts', item.id, { visible: nextVisible });
-      setContent((prev) =>
-        prev
-          ? {
-              ...prev,
-              facts: prev.facts.map((f) =>
-                f.id === item.id ? { ...f, visible: nextVisible } : f
-              ),
-            }
-          : prev
-      );
-    } catch (err) {
-      setListError(err instanceof Error ? err.message : 'Gagal mengubah status tampil.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const handleDeleteFact = async (item: Fact) => {
-    setBusyId(item.id);
-    setListError(null);
-    try {
-      await apiDeleteItem('Facts', item.id);
-      setContent((prev) =>
-        prev ? { ...prev, facts: prev.facts.filter((f) => f.id !== item.id) } : prev
-      );
-      if (selectedFactId === item.id) {
-        setSelectedFactId(null);
-      }
-    } catch (err) {
-      setListError(err instanceof Error ? err.message : 'Gagal menghapus fakta.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const handleMoveFact = async (index: number, direction: 'up' | 'down') => {
-    const swapIdx = direction === 'up' ? index - 1 : index + 1;
-    if (swapIdx < 0 || swapIdx >= facts.length) return;
-
-    const next = [...facts];
-    const [moved] = next.splice(index, 1);
-    next.splice(swapIdx, 0, moved);
-    const reindexed = next.map((item, idx) => ({ ...item, order: idx + 1 }));
-
-    setReordering(true);
-    setListError(null);
-    try {
-      await apiReorderItems(
-        'Facts',
-        reindexed.map((item) => item.id)
-      );
-      setContent((prev) => (prev ? { ...prev, facts: reindexed } : prev));
-    } catch (err) {
-      setListError(err instanceof Error ? err.message : 'Gagal menyimpan urutan.');
-    } finally {
-      setReordering(false);
-    }
   };
 
   const handleFactDirtyChange = useCallback((dirty: boolean) => {

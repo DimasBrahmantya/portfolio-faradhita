@@ -63,25 +63,11 @@ export const profileContactSeoSchema = z.object({
   og_image_url: optionalHttpUrl,
 });
 
-export const profileUpdateSchema = z
-  .object({
-    full_name_1: z.string().trim().max(120).optional(),
-    full_name_2: z.string().trim().max(120).optional(),
-    logo_text: z.string().trim().max(20).optional(),
-    role: z.string().trim().max(240).optional(),
-    hero_cta_primary: z.string().trim().max(80).optional(),
-    hero_cta_secondary: z.string().trim().max(80).optional(),
-    hero_photo_url: optionalHttpUrl.optional(),
-    about_photo_url: optionalHttpUrl.optional(),
-    about_text: z.string().trim().max(4000).optional(),
-    contact_intro: z.string().trim().max(1000).optional(),
-    whatsapp_url: optionalSafeUrl.optional(),
-    linkedin_url: optionalSafeUrl.optional(),
-    email: optionalEmail.optional(),
-    location: z.string().trim().max(200).optional(),
-    meta_title: z.string().trim().max(160).optional(),
-    meta_description: z.string().trim().max(320).optional(),
-    og_image_url: optionalHttpUrl.optional(),
+export const profileUpdateSchema = profileHeroSchema
+  .merge(profileAboutSchema)
+  .merge(profileContactSeoSchema)
+  .partial()
+  .extend({
     custom_sections: z
       .string()
       .max(48000, 'Data section kustom melebihi batas ukuran Google Sheets.')
@@ -262,6 +248,17 @@ export const itemVisiblePatchSchema = z.object({
   visible: z.boolean(),
 });
 
+export const RESERVED_SECTION_SLUGS = new Set([
+  'beranda',
+  'konten-utama',
+  'tentang',
+  'project',
+  'pengalaman',
+  'sertifikat',
+  'keahlian',
+  'kontak',
+]);
+
 export function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -270,6 +267,21 @@ export function slugify(text: string): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 80);
+}
+
+export function resolveUniqueSlug(rawSlug: string, usedSlugs: Iterable<string>): string {
+  const taken = new Set(usedSlugs);
+  const base = slugify(rawSlug) || 'section';
+  if (!taken.has(base) && !RESERVED_SECTION_SLUGS.has(base)) {
+    return base;
+  }
+  let n = 2;
+  let candidate = `${base.slice(0, 76)}-${n}`;
+  while (taken.has(candidate) || RESERVED_SECTION_SLUGS.has(candidate)) {
+    n += 1;
+    candidate = `${base.slice(0, 76)}-${n}`;
+  }
+  return candidate;
 }
 
 export function serializeItemForSheet(

@@ -5,12 +5,11 @@ import { Plus } from 'lucide-react';
 import { useAdminContext } from '@/components/admin/AdminContext';
 import {
   apiCreateItem,
-  apiDeleteItem,
-  apiReorderItems,
   apiUpdateItem,
 } from '@/components/admin/api';
 import { ItemList } from '@/components/admin/ItemList';
 import { SkillForm, type SkillFormPayload } from '@/components/admin/SkillForm';
+import { useSheetListActions } from '@/components/admin/useSheetListActions';
 import type { Skill } from '@/types/content';
 
 export function SkillsSection() {
@@ -21,9 +20,17 @@ export function SkillsSection() {
     skills[0]?.id ?? null
   );
   const [creating, setCreating] = useState(skills.length === 0);
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [reordering, setReordering] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const {
+    busyId,
+    reordering,
+    errorMsg,
+    setErrorMsg,
+    handleToggleVisible,
+    handleDelete,
+    handleMove,
+  } = useSheetListActions('Skills', 'skills', (deletedId) => {
+    if (selectedId === deletedId) setSelectedId(null);
+  });
 
   useEffect(() => {
     return () => setIsDirty(false);
@@ -67,72 +74,6 @@ export function SkillsSection() {
           }
         : prev
     );
-  };
-
-  const handleToggleVisible = async (item: Skill, nextVisible: boolean) => {
-    setBusyId(item.id);
-    setErrorMsg(null);
-    try {
-      await apiUpdateItem('Skills', item.id, { visible: nextVisible });
-      setContent((prev) =>
-        prev
-          ? {
-              ...prev,
-              skills: prev.skills.map((s) =>
-                s.id === item.id ? { ...s, visible: nextVisible } : s
-              ),
-            }
-          : prev
-      );
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal mengubah status.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const handleDelete = async (item: Skill) => {
-    setBusyId(item.id);
-    setErrorMsg(null);
-    try {
-      await apiDeleteItem('Skills', item.id);
-      setContent((prev) =>
-        prev
-          ? { ...prev, skills: prev.skills.filter((s) => s.id !== item.id) }
-          : prev
-      );
-      if (selectedId === item.id) {
-        setSelectedId(null);
-      }
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal menghapus keahlian.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const handleMove = async (index: number, direction: 'up' | 'down') => {
-    const swapIdx = direction === 'up' ? index - 1 : index + 1;
-    if (swapIdx < 0 || swapIdx >= skills.length) return;
-
-    const next = [...skills];
-    const [moved] = next.splice(index, 1);
-    next.splice(swapIdx, 0, moved);
-    const reindexed = next.map((item, idx) => ({ ...item, order: idx + 1 }));
-
-    setReordering(true);
-    setErrorMsg(null);
-    try {
-      await apiReorderItems(
-        'Skills',
-        reindexed.map((item) => item.id)
-      );
-      setContent((prev) => (prev ? { ...prev, skills: reindexed } : prev));
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Gagal menyimpan urutan.');
-    } finally {
-      setReordering(false);
-    }
   };
 
   const existingCategories = Array.from(
