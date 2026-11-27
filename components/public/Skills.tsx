@@ -1,10 +1,11 @@
 import React from 'react';
-import type { Skill } from '@/types/content';
+import type { Profile, Skill } from '@/types/content';
 import { Reveal } from './Reveal';
 import { SkillIcon } from './SkillIcon';
 
 interface SkillsProps {
   skills: Skill[];
+  profile: Profile;
 }
 
 interface SkillGroup {
@@ -12,7 +13,14 @@ interface SkillGroup {
   items: Skill[];
 }
 
-function getSkillCategory(name: string): string {
+const AUTO_CATEGORY_ORDER = [
+  'Bahasa & Notebook',
+  'Visualisasi & BI',
+  'Produktivitas & Office',
+];
+
+/** Tebakan kategori dari nama, dipakai hanya jika kolom kategori di admin kosong. */
+function detectSkillCategory(name: string): string | null {
   const lower = name.toLowerCase();
   if (
     lower.includes('python') ||
@@ -47,32 +55,33 @@ function getSkillCategory(name: string): string {
   ) {
     return 'Produktivitas & Office';
   }
-  return 'Perangkat Lainnya';
+  return null;
 }
 
-export function Skills({ skills }: SkillsProps) {
+export function Skills({ skills, profile }: SkillsProps) {
   if (skills.length === 0) {
     return null;
   }
 
-  const categoryOrder = [
-    'Bahasa & Notebook',
-    'Visualisasi & BI',
-    'Produktivitas & Office',
-    'Perangkat Lainnya',
-  ];
-
+  const fallbackCategory = profile.skills_default_category;
   const groupedMap = new Map<string, Skill[]>();
   for (const skill of skills) {
-    const cat = getSkillCategory(skill.name);
+    const cat = skill.category || detectSkillCategory(skill.name) || fallbackCategory;
     const existing = groupedMap.get(cat) ?? [];
     existing.push(skill);
     groupedMap.set(cat, existing);
   }
 
-  const groups: SkillGroup[] = categoryOrder
-    .map((label) => ({ label, items: groupedMap.get(label) ?? [] }))
-    .filter((group) => group.items.length > 0);
+  const rank = (label: string) => {
+    if (label === fallbackCategory) return Number.MAX_SAFE_INTEGER;
+    const idx = AUTO_CATEGORY_ORDER.indexOf(label);
+    return idx === -1 ? AUTO_CATEGORY_ORDER.length : idx;
+  };
+
+  // Map mempertahankan urutan kemunculan; sort stabil menjaga urutan kategori kustom.
+  const groups: SkillGroup[] = Array.from(groupedMap, ([label, items]) => ({ label, items })).sort(
+    (a, b) => rank(a.label) - rank(b.label)
+  );
 
   return (
     <section
@@ -83,13 +92,13 @@ export function Skills({ skills }: SkillsProps) {
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <Reveal variant="fade-up">
           <p className="font-mono text-xs font-medium uppercase tracking-[0.12em] text-[var(--teal)]">
-            05 / KEAHLIAN &amp; PERANGKAT KERJA
+            {profile.skills_eyebrow}
           </p>
           <h2
             id="skills-heading"
             className="mt-3 font-display text-[30px] font-bold leading-[1.15] tracking-[-0.015em] text-[var(--ink)] sm:text-[36px] lg:text-[42px]"
           >
-            Perangkat yang digunakan sehari-hari
+            {profile.skills_heading}
           </h2>
         </Reveal>
 

@@ -4,10 +4,14 @@ import { cache } from 'react';
 import { gasGet, isGasConfigured } from '@/lib/gas';
 import { cleanIsoDates } from '@/lib/date';
 import { safeHref, safeImageUrl } from '@/lib/url';
+import { normalizeSiteText } from '@/lib/site-text';
 import type {
   Certificate,
   ContentBundle,
   ContentResult,
+  CustomSection,
+  CustomSectionCard,
+  CustomSectionPlacement,
   Experience,
   ExperienceType,
   Fact,
@@ -128,6 +132,7 @@ function normalizeProfile(raw: unknown): Profile {
   const linkedinRaw = asString(p.linkedin_url).trim();
 
   return {
+    ...normalizeSiteText(p),
     full_name_1: asString(p.full_name_1),
     full_name_2: asString(p.full_name_2),
     logo_text: asString(p.logo_text),
@@ -252,13 +257,75 @@ function normalizeSkills(raw: unknown): Skill[] {
       visible: asVisible(item.visible),
       name: asString(item.name),
       icon_url: safeImageUrl(asString(item.icon_url)),
+      category: asString(item.category).trim(),
     }))
     .filter((item) => Boolean(item.id))
     .sort((a, b) => a.order - b.order);
 }
 
+const VALID_PLACEMENTS = new Set<CustomSectionPlacement>([
+  'after-hero',
+  'after-about',
+  'after-projects',
+  'after-experience',
+  'after-certificates',
+  'after-skills',
+]);
+
+function normalizePlacement(raw: unknown): CustomSectionPlacement {
+  const val = asString(raw).trim() as CustomSectionPlacement;
+  return VALID_PLACEMENTS.has(val) ? val : 'after-skills';
+}
+
+function parseCustomSectionCards(raw: unknown): CustomSectionCard[] {
+  if (!Array.isArray(raw)) return [];
+  const cards: CustomSectionCard[] = [];
+  for (const entry of raw) {
+    if (!isRecord(entry)) continue;
+    const title = asString(entry.title).trim();
+    if (!title) continue;
+    cards.push({
+      title,
+      subtitle: asString(entry.subtitle).trim(),
+      description: asString(entry.description).trim(),
+      url: safeHref(asString(entry.url)) ?? '',
+      url_label: asString(entry.url_label).trim(),
+    });
+  }
+  return cards;
+}
+
+function normalizeCustomSections(raw: unknown): CustomSection[] {
+  const parsed = safeJsonParse(raw);
+  if (!Array.isArray(parsed)) return [];
+  return parsed
+    .filter(isRecord)
+    .map((item, idx) => {
+      const id = asString(item.id).trim();
+      const heading = asString(item.heading).trim();
+      const rawSlug = asString(item.slug).trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+      return {
+        id,
+        order: asOrder(item.order, idx + 1),
+        visible: asVisible(item.visible),
+        slug: rawSlug || `section-${id || idx + 1}`,
+        nav_label: asString(item.nav_label).trim(),
+        show_in_nav: item.show_in_nav !== false,
+        placement: normalizePlacement(item.placement),
+        eyebrow: asString(item.eyebrow).trim(),
+        heading,
+        description: asString(item.description).trim(),
+        items: parseCustomSectionCards(item.items),
+        images: parseProjectImages(item.images),
+      };
+    })
+    .filter((item) => Boolean(item.id && item.heading))
+    .sort((a, b) => a.order - b.order);
+}
+
 export function normalizeContentBundle(raw: unknown): ContentBundle {
   const data = isRecord(raw) ? raw : {};
+  const rawProfile = isRecord(data.profile) ? data.profile : {};
   return {
     profile: normalizeProfile(data.profile),
     facts: normalizeFacts(data.facts),
@@ -267,6 +334,7 @@ export function normalizeContentBundle(raw: unknown): ContentBundle {
     experience: normalizeExperience(data.experience),
     publications: normalizePublications(data.publications),
     skills: normalizeSkills(data.skills),
+    custom_sections: normalizeCustomSections(rawProfile.custom_sections),
   };
 }
 
@@ -279,6 +347,7 @@ function filterVisibleContent(bundle: ContentBundle): ContentBundle {
     experience: bundle.experience.filter((item) => item.visible),
     publications: bundle.publications.filter((item) => item.visible),
     skills: bundle.skills.filter((item) => item.visible),
+    custom_sections: bundle.custom_sections.filter((item) => item.visible),
   };
 }
 

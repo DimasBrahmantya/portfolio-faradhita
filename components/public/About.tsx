@@ -54,7 +54,7 @@ export function About({ profile, facts }: AboutProps) {
                     {profile.location && (
                       <p className="flex items-center gap-2">
                         <MapPin className="h-3.5 w-3.5 shrink-0 text-[var(--teal)]" aria-hidden="true" />
-                        <span>Domisili: {profile.location}</span>
+                        <span>{profile.about_location_label}: {profile.location}</span>
                       </p>
                     )}
                   </div>
@@ -70,13 +70,13 @@ export function About({ profile, facts }: AboutProps) {
             className={profile.about_photo_url ? 'md:col-span-7 lg:col-span-8' : 'md:col-span-12 max-w-3xl'}
           >
             <p className="font-mono text-xs font-medium uppercase tracking-[0.12em] text-[var(--teal)]">
-              01 / TENTANG SAYA
+              {profile.about_eyebrow}
             </p>
             <h2
               id="about-heading"
               className="mt-3 font-display text-[30px] font-bold leading-[1.15] tracking-[-0.015em] text-[var(--ink)] sm:text-[36px] lg:text-[42px]"
             >
-              Mengubah data mentah menjadi temuan yang jelas dan dapat ditindaklanjuti.
+              {profile.about_heading}
             </h2>
 
             <div className="mt-6 space-y-4 text-base leading-relaxed text-[var(--mute)]">

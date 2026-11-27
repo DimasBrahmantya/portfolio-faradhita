@@ -29,13 +29,13 @@ export function ContactFooter({ profile }: ContactFooterProps) {
           <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
             <div className="max-w-xl">
               <p className="font-mono text-xs font-medium uppercase tracking-[0.12em] text-[#58c9d1]">
-                06 / KONTAK &amp; KOLABORASI
+                {profile.contact_eyebrow}
               </p>
               <h2
                 id="contact-heading"
                 className="mt-3 font-display text-[30px] font-bold leading-[1.15] tracking-[-0.015em] text-[#edf2f5] sm:text-[36px] lg:text-[42px]"
               >
-                Mari terhubung
+                {profile.contact_heading}
               </h2>
               {profile.contact_intro && (
                 <p className="mt-3 text-base leading-relaxed text-[#a4b5c2]">
@@ -53,7 +53,7 @@ export function ContactFooter({ profile }: ContactFooterProps) {
                   className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-[#c92a45] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#ad2139]"
                 >
                   <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                  <span>Chat WhatsApp</span>
+                  <span>{profile.contact_whatsapp_label}</span>
                 </a>
               )}
 
@@ -65,7 +65,7 @@ export function ContactFooter({ profile }: ContactFooterProps) {
                   className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-[#3a4f5e] bg-[#16232d] px-5 py-2.5 text-sm font-semibold text-[#edf2f5] transition-colors hover:border-[#58c9d1] hover:text-[#58c9d1]"
                 >
                   <Linkedin className="h-4 w-4" aria-hidden="true" />
-                  <span>Kunjungi LinkedIn</span>
+                  <span>{profile.contact_linkedin_label}</span>
                 </a>
               )}
 
@@ -75,7 +75,7 @@ export function ContactFooter({ profile }: ContactFooterProps) {
                   className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-[#3a4f5e] bg-[#16232d] px-5 py-2.5 text-sm font-semibold text-[#edf2f5] transition-colors hover:border-[#58c9d1] hover:text-[#58c9d1]"
                 >
                   <Mail className="h-4 w-4" aria-hidden="true" />
-                  <span>Kirim Email</span>
+                  <span>{profile.contact_email_label}</span>
                 </a>
               )}
             </div>
@@ -87,7 +87,7 @@ export function ContactFooter({ profile }: ContactFooterProps) {
       <footer className="border-t border-[#253744]">
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-5 py-6 text-xs text-[#a4b5c2] sm:flex-row sm:items-center sm:px-8">
           <p>
-            {[profile.location, fullName].filter(Boolean).join(' · ')}
+            {profile.footer_text.trim() || [profile.location, fullName].filter(Boolean).join(' · ')}
           </p>
           {profile.email && emailHref && (
             <a

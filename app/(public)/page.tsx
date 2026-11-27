@@ -11,6 +11,7 @@ import { ExperienceSection } from '@/components/public/ExperienceSection';
 import { Certificates } from '@/components/public/Certificates';
 import { Skills } from '@/components/public/Skills';
 import { ContactFooter } from '@/components/public/ContactFooter';
+import { CustomSectionBlock } from '@/components/public/CustomSectionBlock';
 import { EmptyState } from '@/components/public/EmptyState';
 import { ErrorFallback } from '@/components/public/ErrorFallback';
 import type { ContentBundle } from '@/types/content';
@@ -215,14 +216,23 @@ export default async function HomePage() {
     );
   }
 
-  const { profile, facts, projects, certificates, experience, publications, skills } =
-    result.data;
+  const {
+    profile,
+    facts,
+    projects,
+    certificates,
+    experience,
+    publications,
+    skills,
+    custom_sections: customSections,
+  } = result.data;
 
   const hasAbout = Boolean(profile.about_text.trim() || profile.about_photo_url);
   const hasProjects = projects.length > 0;
   const hasExperience = experience.length > 0 || publications.length > 0;
   const hasCertificates = certificates.length > 0;
   const hasSkills = skills.length > 0;
+  const hasCustom = customSections.length > 0;
   const hasContact = Boolean(
     profile.contact_intro.trim() ||
       safeHref(profile.whatsapp_url) ||
@@ -230,14 +240,36 @@ export default async function HomePage() {
       safeHref(profile.email)
   );
 
+  const customAt = (placement: (typeof customSections)[number]['placement']) =>
+    customSections.filter((s) => s.placement === placement);
+
+  const customNav = (placement: (typeof customSections)[number]['placement']): NavLinkItem[] =>
+    customAt(placement)
+      .filter((s) => s.show_in_nav)
+      .map((s) => ({ id: s.slug, label: s.nav_label || s.heading }));
+
   const navLinks: NavLinkItem[] = [
-    hasAbout ? { id: 'tentang', label: 'Tentang' } : null,
-    hasProjects ? { id: 'project', label: 'Project' } : null,
-    hasExperience ? { id: 'pengalaman', label: 'Pengalaman' } : null,
-    hasCertificates ? { id: 'sertifikat', label: 'Sertifikat' } : null,
-    hasSkills ? { id: 'keahlian', label: 'Keahlian' } : null,
-    hasContact ? { id: 'kontak', label: 'Kontak' } : null,
-  ].filter((item): item is NavLinkItem => item !== null);
+    ...customNav('after-hero'),
+    ...(hasAbout ? [{ id: 'tentang', label: profile.nav_about }] : []),
+    ...customNav('after-about'),
+    ...(hasProjects ? [{ id: 'project', label: profile.nav_projects }] : []),
+    ...customNav('after-projects'),
+    ...(hasExperience ? [{ id: 'pengalaman', label: profile.nav_experience }] : []),
+    ...customNav('after-experience'),
+    ...(hasCertificates ? [{ id: 'sertifikat', label: profile.nav_certificates }] : []),
+    ...customNav('after-certificates'),
+    ...(hasSkills ? [{ id: 'keahlian', label: profile.nav_skills }] : []),
+    ...customNav('after-skills'),
+    ...(hasContact ? [{ id: 'kontak', label: profile.nav_contact }] : []),
+  ];
+
+  const renderCustom = (
+    placement: (typeof customSections)[number]['placement'],
+    tinted: boolean
+  ) =>
+    customAt(placement).map((sec, idx) => (
+      <CustomSectionBlock key={sec.id} section={sec} tinted={idx % 2 === 0 ? tinted : !tinted} />
+    ));
 
   const structuredData = buildStructuredData(result.data);
 
@@ -258,7 +290,7 @@ export default async function HomePage() {
             role="status"
             className="border-b border-[var(--line)] bg-[var(--soft)] px-5 py-2 text-center text-xs text-[var(--teal)]"
           >
-            Menampilkan salinan cache terakhir karena koneksi pembaruan data sedang terkendala.
+            {profile.cache_notice}
           </div>
         )}
 
@@ -271,24 +303,36 @@ export default async function HomePage() {
             hasContact={hasContact}
           />
 
+          {renderCustom('after-hero', true)}
+
           {!hasAbout &&
             !hasProjects &&
             !hasExperience &&
             !hasCertificates &&
             !hasSkills &&
+            !hasCustom &&
             !hasContact && <EmptyState />}
 
           {hasAbout && <About profile={profile} facts={facts} />}
+          {renderCustom('after-about', false)}
 
-          {hasProjects && <Projects projects={projects} />}
+          {hasProjects && <Projects projects={projects} profile={profile} />}
+          {renderCustom('after-projects', true)}
 
           {hasExperience && (
-            <ExperienceSection experience={experience} publications={publications} />
+            <ExperienceSection
+              experience={experience}
+              publications={publications}
+              profile={profile}
+            />
           )}
+          {renderCustom('after-experience', false)}
 
-          {hasCertificates && <Certificates certificates={certificates} />}
+          {hasCertificates && <Certificates certificates={certificates} profile={profile} />}
+          {renderCustom('after-certificates', true)}
 
-          {hasSkills && <Skills skills={skills} />}
+          {hasSkills && <Skills skills={skills} profile={profile} />}
+          {renderCustom('after-skills', false)}
         </main>
 
         <ContactFooter profile={profile} />

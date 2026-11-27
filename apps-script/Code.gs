@@ -11,7 +11,7 @@ const SHEETS = {
   Certificates: ['id', 'order', 'visible', 'title', 'image_url', 'issuer', 'issued_at', 'credential_url'],
   Experience:   ['id', 'order', 'visible', 'type', 'period', 'title', 'subtitle', 'points', 'images'],
   Publications: ['id', 'order', 'visible', 'title', 'venue', 'date', 'url'],
-  Skills:       ['id', 'order', 'visible', 'name', 'icon_url'],
+  Skills:       ['id', 'order', 'visible', 'name', 'icon_url', 'category'],
 };
 const LIST_SHEETS = ['Facts', 'Projects', 'Certificates', 'Experience', 'Publications', 'Skills'];
 const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp'];
@@ -137,6 +137,20 @@ function headers_(sh) {
   return sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
 }
 
+// Tambah kolom yang terdaftar di SHEETS tapi belum ada di sheet (mis. kolom baru setelah update).
+function ensureColumns_(sh, name) {
+  const head = headers_(sh).map(function (h) { return String(h); });
+  (SHEETS[name] || []).forEach(function (colName) {
+    if (head.indexOf(colName) === -1) {
+      const col = head.length + 1;
+      sh.getRange(1, col, sh.getMaxRows(), 1).setNumberFormat('@');
+      sh.getRange(1, col).setValue(colName).setFontWeight('bold');
+      head.push(colName);
+    }
+  });
+  return head;
+}
+
 /* ---------- Read ---------- */
 
 function getAll_() {
@@ -201,7 +215,7 @@ function updateProfile_(values) {
 
 function createItem_(name, item) {
   const sh = sheet_(name);
-  const head = headers_(sh);
+  const head = ensureColumns_(sh, name);
   const existing = readList_(name);
   const nextOrder = existing.reduce(function (m, x) { return Math.max(m, x.order); }, 0) + 1;
   const id = Utilities.getUuid().replace(/-/g, '').slice(0, 10);
@@ -219,7 +233,7 @@ function updateItem_(name, id, item) {
   const sh = sheet_(name);
   const row = findRow_(sh, id);
   if (row < 0) throw new Error('not_found');
-  const head = headers_(sh);
+  const head = ensureColumns_(sh, name);
   head.forEach(function (h, i) {
     if (h === 'id' || h === 'order') return;
     if (Object.prototype.hasOwnProperty.call(item, h)) {

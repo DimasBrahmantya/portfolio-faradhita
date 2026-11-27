@@ -14,9 +14,12 @@ export type AdminSectionSlug =
   | 'pengalaman'
   | 'publikasi'
   | 'keahlian'
+  | 'section'
   | 'kontak';
 
-export interface Profile {
+import type { SiteText } from '@/lib/site-text';
+
+export interface Profile extends SiteText {
   full_name_1: string;
   full_name_2: string;
   logo_text: string;
@@ -96,6 +99,35 @@ export interface Publication extends ListItemBase {
 export interface Skill extends ListItemBase {
   name: string;
   icon_url: string;
+  category: string;
+}
+
+export type CustomSectionPlacement =
+  | 'after-hero'
+  | 'after-about'
+  | 'after-projects'
+  | 'after-experience'
+  | 'after-certificates'
+  | 'after-skills';
+
+export interface CustomSectionCard {
+  title: string;
+  subtitle: string;
+  description: string;
+  url: string;
+  url_label: string;
+}
+
+export interface CustomSection extends ListItemBase {
+  slug: string;
+  nav_label: string;
+  show_in_nav: boolean;
+  placement: CustomSectionPlacement;
+  eyebrow: string;
+  heading: string;
+  description: string;
+  items: CustomSectionCard[];
+  images: ProjectImage[];
 }
 
 export interface ContentBundle {
@@ -106,6 +138,7 @@ export interface ContentBundle {
   experience: Experience[];
   publications: Publication[];
   skills: Skill[];
+  custom_sections: CustomSection[];
 }
 
 export interface ContentResult {

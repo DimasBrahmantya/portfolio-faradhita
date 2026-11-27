@@ -1,22 +1,29 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { useAdminContext } from '@/components/admin/AdminContext';
 import { AboutFactsSection } from '@/components/admin/AboutFactsSection';
 import { CertificatesSection } from '@/components/admin/CertificatesSection';
 import { ContactSeoForm } from '@/components/admin/ContactSeoForm';
+import { CustomSectionsSection } from '@/components/admin/CustomSectionsSection';
 import { ExperienceSection } from '@/components/admin/ExperienceSection';
 import { ProfileHeroForm } from '@/components/admin/ProfileHeroForm';
 import { ProjectsSection } from '@/components/admin/ProjectsSection';
 import { PublicationsSection } from '@/components/admin/PublicationsSection';
+import { SectionTextEditor } from '@/components/admin/SectionTextEditor';
 import { SkillsSection } from '@/components/admin/SkillsSection';
 import type { AdminSectionSlug } from '@/types/content';
 
 export function AdminSectionClient({ section }: { section: AdminSectionSlug }) {
   const { content, loading, error, refreshContent } = useAdminContext();
+  const [mounted, setMounted] = useState(false);
 
-  if (loading && !content) {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || (loading && !content)) {
     return (
       <div
         aria-busy="true"
@@ -75,6 +82,15 @@ export function AdminSectionClient({ section }: { section: AdminSectionSlug }) {
     );
   }
 
+  return (
+    <div className="space-y-8">
+      <SectionBody section={section} />
+      {section !== 'section' && <SectionTextEditor key={section} group={section} />}
+    </div>
+  );
+}
+
+function SectionBody({ section }: { section: AdminSectionSlug }) {
   switch (section) {
     case 'profil':
       return <ProfileHeroForm />;
@@ -90,6 +106,8 @@ export function AdminSectionClient({ section }: { section: AdminSectionSlug }) {
       return <PublicationsSection />;
     case 'keahlian':
       return <SkillsSection />;
+    case 'section':
+      return <CustomSectionsSection />;
     case 'kontak':
       return <ContactSeoForm />;
   }

@@ -20,7 +20,8 @@ export function Hero({
   hasContact,
 }: HeroProps) {
   const fullName = [profile.full_name_1, profile.full_name_2].filter(Boolean).join(' ') || 'Faradhita Eka Septiana';
-  const eyebrowParts = [profile.location, profile.role.split('·')[0]?.trim()].filter(Boolean);
+  const autoEyebrow = [profile.location, profile.role.split('·')[0]?.trim()].filter(Boolean).join(' · ');
+  const eyebrow = profile.hero_eyebrow.trim() || autoEyebrow;
   const hasPrimaryTarget = hasProjects || hasAbout;
   const primaryHref = hasProjects ? '#project' : '#tentang';
   const whatsappHref = safeHref(profile.whatsapp_url);
@@ -62,12 +63,12 @@ export function Hero({
             profile.hero_photo_url ? 'md:col-span-7' : 'md:col-span-12 max-w-3xl'
           }`}
         >
-          {eyebrowParts.length > 0 && (
+          {eyebrow && (
             <p
               className="animate-hero-fade-up font-mono text-xs font-medium uppercase tracking-[0.12em] text-[var(--teal)]"
               style={{ animationDelay: '40ms' }}
             >
-              {eyebrowParts.join(' · ')}
+              {eyebrow}
             </p>
           )}
 

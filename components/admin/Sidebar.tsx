@@ -10,6 +10,7 @@ import {
   ExternalLink,
   FolderKanban,
   Globe,
+  LayoutGrid,
   LogOut,
   Menu,
   Sparkles,
@@ -25,7 +26,13 @@ interface NavItem {
   slug: AdminSectionSlug;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
-  countKey?: 'projects' | 'certificates' | 'experience' | 'publications' | 'skills';
+  countKey?:
+    | 'projects'
+    | 'certificates'
+    | 'experience'
+    | 'publications'
+    | 'skills'
+    | 'custom_sections';
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -36,6 +43,7 @@ const NAV_ITEMS: NavItem[] = [
   { slug: 'pengalaman', label: 'Pengalaman', icon: Briefcase, countKey: 'experience' },
   { slug: 'publikasi', label: 'Publikasi', icon: BookOpen, countKey: 'publications' },
   { slug: 'keahlian', label: 'Keahlian', icon: Sparkles, countKey: 'skills' },
+  { slug: 'section', label: 'Section Kustom', icon: LayoutGrid, countKey: 'custom_sections' },
   { slug: 'kontak', label: 'Kontak & SEO', icon: Globe },
 ];
 

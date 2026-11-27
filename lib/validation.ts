@@ -1,5 +1,13 @@
 import { z } from 'zod';
 import { isValidHttpUrl, isValidSafeUrl } from '@/lib/url';
+import { SITE_TEXT_KEYS, SITE_TEXT_MAX, type SiteTextKey } from '@/lib/site-text';
+
+const siteTextUpdateShape = Object.fromEntries(
+  SITE_TEXT_KEYS.map((key) => [
+    key,
+    z.string().trim().max(SITE_TEXT_MAX, `Teks maksimal ${SITE_TEXT_MAX} karakter.`).optional(),
+  ])
+) as Record<SiteTextKey, z.ZodOptional<z.ZodString>>;
 
 const optionalHttpUrl = z
   .string()
@@ -74,6 +82,23 @@ export const profileUpdateSchema = z
     meta_title: z.string().trim().max(160).optional(),
     meta_description: z.string().trim().max(320).optional(),
     og_image_url: optionalHttpUrl.optional(),
+    custom_sections: z
+      .string()
+      .max(48000, 'Data section kustom melebihi batas ukuran Google Sheets.')
+      .refine(
+        (val) => {
+          if (!val.trim()) return true;
+          try {
+            const parsed = JSON.parse(val);
+            return customSectionsArraySchema.safeParse(parsed).success;
+          } catch {
+            return false;
+          }
+        },
+        { message: 'Format data section kustom tidak valid.' }
+      )
+      .optional(),
+    ...siteTextUpdateShape,
   })
   .strict()
   .refine((obj) => Object.keys(obj).length > 0, {
@@ -165,8 +190,51 @@ export const publicationInputSchema = z.object({
 export const skillInputSchema = z.object({
   name: z.string().trim().min(1, 'Nama keahlian wajib diisi.').max(120),
   icon_url: optionalHttpUrl.default(''),
+  category: z.string().trim().max(80, 'Kategori maksimal 80 karakter.').default(''),
   visible: z.boolean().default(true),
 });
+
+export const customSectionPlacementSchema = z.enum([
+  'after-hero',
+  'after-about',
+  'after-projects',
+  'after-experience',
+  'after-certificates',
+  'after-skills',
+]);
+
+export const customSectionCardSchema = z.object({
+  title: z.string().trim().min(1, 'Judul item wajib diisi.').max(200),
+  subtitle: z.string().trim().max(160).default(''),
+  description: z.string().trim().max(1000).default(''),
+  url: optionalSafeUrl.default(''),
+  url_label: z.string().trim().max(80).default(''),
+});
+
+export const customSectionInputSchema = z.object({
+  slug: z
+    .string()
+    .trim()
+    .max(80)
+    .regex(/^[a-z0-9-]*$/, 'Slug hanya boleh huruf kecil, angka, dan tanda hubung.')
+    .default(''),
+  nav_label: z.string().trim().max(40).default(''),
+  show_in_nav: z.boolean().default(true),
+  placement: customSectionPlacementSchema.default('after-skills'),
+  eyebrow: z.string().trim().max(120).default(''),
+  heading: z.string().trim().min(1, 'Judul section wajib diisi.').max(200),
+  description: z.string().trim().max(3000).default(''),
+  items: z.array(customSectionCardSchema).max(20).default([]),
+  images: z.array(projectImageSchema).max(12).default([]),
+  visible: z.boolean().default(true),
+});
+
+export const customSectionStoredSchema = customSectionInputSchema.extend({
+  id: z.string().trim().min(1).max(64),
+  order: z.number().int().min(0).default(0),
+});
+
+export const customSectionsArraySchema = z.array(customSectionStoredSchema).max(15);
 
 export const reorderSchema = z.object({
   sheet: sheetNameSchema,
@@ -277,6 +345,7 @@ export function serializeItemForSheet(
       return {
         name: data.name,
         icon_url: data.icon_url,
+        category: data.category,
         visible: data.visible,
       };
     }

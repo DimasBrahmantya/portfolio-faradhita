@@ -10,11 +10,13 @@ import type { Skill } from '@/types/content';
 export interface SkillFormPayload {
   name: string;
   icon_url: string;
+  category: string;
   visible: boolean;
 }
 
 interface SkillFormProps {
   skill: Skill | null;
+  categories?: string[];
   onSave: (payload: SkillFormPayload) => Promise<void>;
   onDirtyChange: (dirty: boolean) => void;
   onCancelNew?: () => void;
@@ -22,12 +24,14 @@ interface SkillFormProps {
 
 export function SkillForm({
   skill,
+  categories = [],
   onSave,
   onDirtyChange,
   onCancelNew,
 }: SkillFormProps) {
   const [name, setName] = useState(skill?.name ?? '');
   const [iconUrl, setIconUrl] = useState(skill?.icon_url ?? '');
+  const [category, setCategory] = useState(skill?.category ?? '');
   const [visible, setVisible] = useState(skill?.visible ?? true);
 
   const [dirty, setDirty] = useState(false);
@@ -38,6 +42,7 @@ export function SkillForm({
   useEffect(() => {
     setName(skill?.name ?? '');
     setIconUrl(skill?.icon_url ?? '');
+    setCategory(skill?.category ?? '');
     setVisible(skill?.visible ?? true);
     setDirty(false);
     setStatus('idle');
@@ -58,6 +63,7 @@ export function SkillForm({
     const parsed = skillInputSchema.safeParse({
       name,
       icon_url: iconUrl,
+      category,
       visible,
     });
     if (!parsed.success) {
@@ -119,6 +125,33 @@ export function SkillForm({
           placeholder="Contoh: Python, Google Looker Studio, Microsoft Excel"
           className="mt-1.5 min-h-[42px] w-full rounded-[var(--radius-control)] border border-[var(--line)] bg-[var(--input-bg)] px-3.5 py-2 text-sm text-[var(--ink)] focus:border-[var(--teal)] focus:outline-none"
         />
+      </div>
+
+      <div>
+        <label htmlFor="skill-category" className="block text-sm font-medium text-[var(--ink)]">
+          Kategori (opsional)
+        </label>
+        <p className="mt-0.5 text-xs text-[var(--mute)]">
+          Judul grup di halaman publik, mis. &quot;Bahasa &amp; Notebook&quot;. Kosongkan untuk kategori otomatis.
+        </p>
+        <input
+          id="skill-category"
+          type="text"
+          list="skill-category-options"
+          value={category}
+          maxLength={80}
+          onChange={(e) => {
+            setCategory(e.target.value);
+            markDirty();
+          }}
+          placeholder="Otomatis"
+          className="mt-1.5 min-h-[42px] w-full rounded-[var(--radius-control)] border border-[var(--line)] bg-[var(--input-bg)] px-3.5 py-2 text-sm text-[var(--ink)] focus:border-[var(--teal)] focus:outline-none"
+        />
+        <datalist id="skill-category-options">
+          {categories.map((cat) => (
+            <option key={cat} value={cat} />
+          ))}
+        </datalist>
       </div>
 
       <div>

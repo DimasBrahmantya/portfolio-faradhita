@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Expand, ExternalLink } from 'lucide-react';
-import type { Certificate } from '@/types/content';
+import type { Certificate, Profile } from '@/types/content';
 import { safeHref } from '@/lib/url';
 import { useLightbox } from './Lightbox';
 import { Reveal } from './Reveal';
@@ -10,9 +10,10 @@ import { SafeImage } from './SafeImage';
 
 interface CertificatesProps {
   certificates: Certificate[];
+  profile: Profile;
 }
 
-export function Certificates({ certificates }: CertificatesProps) {
+export function Certificates({ certificates, profile }: CertificatesProps) {
   const { openLightbox } = useLightbox();
 
   if (certificates.length === 0) {
@@ -35,18 +36,18 @@ export function Certificates({ certificates }: CertificatesProps) {
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="font-mono text-xs font-medium uppercase tracking-[0.12em] text-[var(--teal)]">
-              04 / SERTIFIKAT &amp; SPESIALISASI
+              {profile.certificates_eyebrow}
             </p>
             <h2
               id="certificates-heading"
               className="mt-3 font-display text-[30px] font-bold leading-[1.15] tracking-[-0.015em] text-[var(--ink)] sm:text-[36px] lg:text-[42px]"
             >
-              Sertifikat keahlian dan studi kasus
+              {profile.certificates_heading}
             </h2>
           </div>
-          <p className="text-sm text-[var(--mute)]">
-            Klik sertifikat untuk memperbesar
-          </p>
+          {profile.certificates_hint && (
+            <p className="text-sm text-[var(--mute)]">{profile.certificates_hint}</p>
+          )}
         </div>
       </Reveal>
 
@@ -101,7 +102,7 @@ export function Certificates({ certificates }: CertificatesProps) {
                     rel="noopener noreferrer"
                     className="mt-3 inline-flex min-h-[44px] items-center gap-1.5 text-xs font-semibold text-[var(--acc)] hover:underline"
                   >
-                    <span>Lihat Kredensial</span>
+                    <span>{profile.certificates_button}</span>
                     <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                   </a>
                 )}

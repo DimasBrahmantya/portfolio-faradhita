@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { BookOpen, Expand, ExternalLink } from 'lucide-react';
-import type { Experience, ExperienceType, Publication } from '@/types/content';
+import type { Experience, ExperienceType, Profile, Publication } from '@/types/content';
 import { safeHref } from '@/lib/url';
 import { useLightbox } from './Lightbox';
 import { Reveal } from './Reveal';
@@ -11,20 +11,21 @@ import { SafeImage } from './SafeImage';
 interface ExperienceSectionProps {
   experience: Experience[];
   publications: Publication[];
+  profile: Profile;
 }
 
-const TYPE_LABELS: Record<ExperienceType, string> = {
-  work: 'Pengalaman Kerja',
-  education: 'Pendidikan',
-  training: 'Pelatihan & Sertifikasi',
-};
-
-export function ExperienceSection({ experience, publications }: ExperienceSectionProps) {
+export function ExperienceSection({ experience, publications, profile }: ExperienceSectionProps) {
   const { openLightbox } = useLightbox();
 
   if (experience.length === 0 && publications.length === 0) {
     return null;
   }
+
+  const typeLabels: Record<ExperienceType, string> = {
+    work: profile.experience_label_work,
+    education: profile.experience_label_education,
+    training: profile.experience_label_training,
+  };
 
   return (
     <section
@@ -35,20 +36,20 @@ export function ExperienceSection({ experience, publications }: ExperienceSectio
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <Reveal variant="fade-up">
           <p className="font-mono text-xs font-medium uppercase tracking-[0.12em] text-[var(--teal)]">
-            03 / PENGALAMAN, PENDIDIKAN &amp; PUBLIKASI
+            {profile.experience_eyebrow}
           </p>
           <h2
             id="experience-heading"
             className="mt-3 font-display text-[30px] font-bold leading-[1.15] tracking-[-0.015em] text-[var(--ink)] sm:text-[36px] lg:text-[42px]"
           >
-            Pengalaman kerja, magang, dan riset akademik
+            {profile.experience_heading}
           </h2>
         </Reveal>
 
         {experience.length > 0 && (
           <ol className="relative mt-10 space-y-6 before:absolute before:bottom-4 before:left-[11px] before:top-4 before:w-px before:bg-[var(--line)] md:before:left-[219px]">
             {experience.map((item, expIdx) => {
-              const typeLabel = TYPE_LABELS[item.type] || 'Pengalaman';
+              const typeLabel = typeLabels[item.type] || 'Pengalaman';
               const dotColor =
                 item.type === 'work' ? 'bg-[var(--teal)]' : 'bg-[var(--acc)]';
 
@@ -123,7 +124,7 @@ export function ExperienceSection({ experience, publications }: ExperienceSectio
                               <button
                                 type="button"
                                 onClick={() =>
-                                  openLightbox(lightboxItems, imgIdx, 'DOKUMENTASI')
+                                  openLightbox(lightboxItems, imgIdx, typeLabel.toUpperCase())
                                 }
                                 aria-label={`Perbesar gambar: ${altText}`}
                                 className="group relative block w-full cursor-zoom-in overflow-hidden bg-[var(--soft)]/40 text-left"
@@ -177,7 +178,7 @@ export function ExperienceSection({ experience, publications }: ExperienceSectio
                     <p className="flex items-center gap-2 font-mono text-xs font-medium uppercase tracking-wider text-[var(--acc)]">
                       <BookOpen className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                       <span>
-                        PUBLIKASI JURNAL ILMIAH{metaLabel ? ` · ${metaLabel}` : ''}
+                        {[profile.publication_label, metaLabel].filter(Boolean).join(' · ')}
                       </span>
                     </p>
                     <h3 className="mt-2 font-display text-lg font-bold leading-snug text-[var(--ink)] sm:text-xl">
@@ -197,7 +198,7 @@ export function ExperienceSection({ experience, publications }: ExperienceSectio
                       rel="noopener noreferrer"
                       className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-lg border border-[var(--acc)]/40 bg-[var(--surf)] px-4 py-2 text-sm font-semibold text-[var(--acc)] transition-colors hover:border-[var(--acc)] hover:bg-[var(--acc-btn)] hover:text-white"
                     >
-                      <span>Buka Artikel (DOI)</span>
+                      <span>{profile.publication_button}</span>
                       <ExternalLink className="h-4 w-4" aria-hidden="true" />
                     </a>
                   )}

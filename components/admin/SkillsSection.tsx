@@ -135,6 +135,15 @@ export function SkillsSection() {
     }
   };
 
+  const existingCategories = Array.from(
+    new Set([
+      'Bahasa & Notebook',
+      'Visualisasi & BI',
+      'Produktivitas & Office',
+      ...skills.map((s) => s.category).filter(Boolean),
+    ])
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -175,9 +184,11 @@ export function SkillsSection() {
           items={skills}
           selectedId={creating ? null : selectedItem?.id}
           getTitle={(item) => item.name}
-          getSubtitle={(item) =>
-            item.icon_url ? 'Ikon kustom' : 'Ikon bawaan / teks'
-          }
+          getSubtitle={(item) => {
+            const cat = item.category || 'Kategori otomatis';
+            const icon = item.icon_url ? 'Ikon kustom' : 'Ikon bawaan';
+            return `${cat} · ${icon}`;
+          }}
           onSelect={(item) => {
             if (!confirmDiscardIfDirty()) return;
             setCreating(false);
@@ -192,6 +203,7 @@ export function SkillsSection() {
 
         <SkillForm
           skill={selectedItem}
+          categories={existingCategories}
           onSave={handleSave}
           onDirtyChange={handleDirtyChange}
           onCancelNew={

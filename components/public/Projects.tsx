@@ -2,16 +2,17 @@
 
 import React from 'react';
 import { Expand } from 'lucide-react';
-import type { Project } from '@/types/content';
+import type { Profile, Project } from '@/types/content';
 import { useLightbox } from './Lightbox';
 import { Reveal } from './Reveal';
 import { SafeImage } from './SafeImage';
 
 interface ProjectsProps {
   projects: Project[];
+  profile: Profile;
 }
 
-export function Projects({ projects }: ProjectsProps) {
+export function Projects({ projects, profile }: ProjectsProps) {
   const { openLightbox } = useLightbox();
 
   if (projects.length === 0) {
@@ -28,18 +29,18 @@ export function Projects({ projects }: ProjectsProps) {
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="font-mono text-xs font-medium uppercase tracking-[0.12em] text-[var(--teal)]">
-              02 / STUDI KASUS PROJECT
+              {profile.projects_eyebrow}
             </p>
             <h2
               id="projects-heading"
               className="mt-3 font-display text-[30px] font-bold leading-[1.15] tracking-[-0.015em] text-[var(--ink)] sm:text-[36px] lg:text-[42px]"
             >
-              Studi kasus analisis &amp; visualisasi data
+              {profile.projects_heading}
             </h2>
           </div>
-          <p className="text-sm text-[var(--mute)]">
-            Klik gambar untuk pratinjau penuh (Lightbox)
-          </p>
+          {profile.projects_hint && (
+            <p className="text-sm text-[var(--mute)]">{profile.projects_hint}</p>
+          )}
         </div>
       </Reveal>
 
@@ -61,7 +62,7 @@ export function Projects({ projects }: ProjectsProps) {
                 className="rounded-2xl border border-[var(--line)] bg-[var(--surf)] p-6 shadow-xs transition-all duration-300 hover:border-[var(--teal)]/40 hover:shadow-[var(--shadow-elevated)] sm:p-8"
               >
               <p className="font-mono text-xs font-medium uppercase tracking-[0.12em] text-[var(--acc)]">
-                STUDI KASUS {String(projectIdx + 1).padStart(2, '0')}
+                {profile.projects_item_label} {String(projectIdx + 1).padStart(2, '0')}
               </p>
 
               <h3 className="mt-2 font-display text-[22px] font-bold leading-snug text-[var(--ink)] sm:text-[26px]">
@@ -136,7 +137,7 @@ export function Projects({ projects }: ProjectsProps) {
                             openLightbox(
                               lightboxItems,
                               imgIdx,
-                              `PROJECT ${String(projectIdx + 1).padStart(2, '0')}`
+                              `${profile.projects_item_label} ${String(projectIdx + 1).padStart(2, '0')}`
                             )
                           }
                           aria-label={`Perbesar gambar: ${altText}`}

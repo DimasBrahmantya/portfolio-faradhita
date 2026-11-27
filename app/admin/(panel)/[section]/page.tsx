@@ -11,6 +11,7 @@ const VALID_SECTIONS = new Set<AdminSectionSlug>([
   'pengalaman',
   'publikasi',
   'keahlian',
+  'section',
   'kontak',
 ]);
 
